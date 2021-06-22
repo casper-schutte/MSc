@@ -1,0 +1,34 @@
+22/06/21
+
+Notes on Bowtie2:
+At this time the aim is to investigate the feasibility of
+using Bowtie2 to map reads of one genome onto another and
+vice versa. I am currently reading the documentation in
+the bowtie2 manual and there are many aspects to consider
+and keep in mind.
+
+Different modes of reporting alignments.
+Default mode (search for multiple alignments and report
+the best one) will be used initially. My initial experiment
+will simply introduce a few large rearrangements to a small
+example genome and investigate whether bowtie2 and SAMtools
+will be sufficient to identify rearrangements (and their
+breakpoints). If ambiguity becomes a problem, consider
+a different reporting mode.
+In alternative reporting modes, the user can choose to have
+all valid alignments returned (-a mode) or specify an upper
+threshold for returned alignments (-k mode). Perhaps reporting lower-scoring
+alignments would be helpful for finding specific kinds of rearrangements.
+Update: After initial testing with default mode, I will also test using
+the other modes.
+
+Randomness:
+There is randomness in the way bowtie2 chooses alignments.
+When there are equally-good choices for where a read can map,
+it uses a pseudo-randomly generated number to choose of them.
+The seed for the RNG changes for each read BUT the seed can
+set with "--seed" such that the same seed is used, making
+alignments a reproducible action.
+An important consideration is whether the bowtie2 python wrapper will
+allow me the same level of control over the parameters.
+
