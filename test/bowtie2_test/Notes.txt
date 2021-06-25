@@ -32,3 +32,13 @@ alignments a reproducible action.
 An important consideration is whether the bowtie2 python wrapper will
 allow me the same level of control over the parameters.
 
+
+Notes 25/06/21
+Read through bowtie2 documentation. Practiced using the tool with the
+example genome and reads in the "example" folder (also samtools and bcftools)
+There is a perl script for generating reads included with bowtie2, but writing a python
+script that I can control and understand would be better. This is where those simulation programs might come
+in handy, generating realistic read data. At this point, I am looking at making simple rearrangements and testing
+whether I can find them visually. Think about the file formats, how are alignments (and misalignments) reported?
+Testing paired-end alignment and variant calling using BCFtools, but this might not be what I want to do.
+
