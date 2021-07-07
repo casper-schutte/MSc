@@ -1,0 +1,8 @@
+07/07/21:
+    - Update experiment flow diagram
+    - Make a very general/reusable script to make reads:
+        - Variable length
+        - Variable overlap
+        - Variable to keep track of original position
+        - Variable to associate a read with quality score
+        - Way to write to a file (format?)
