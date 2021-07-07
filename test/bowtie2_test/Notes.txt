@@ -42,3 +42,13 @@ in handy, generating realistic read data. At this point, I am looking at making 
 whether I can find them visually. Think about the file formats, how are alignments (and misalignments) reported?
 Testing paired-end alignment and variant calling using BCFtools, but this might not be what I want to do.
 
+
+Notes 07/07/21:
+I extracted the sequence data from fastA file, verified that no seq data was lost.
+(also need to remember that reads will have quality scores, so the script will have to extract the
+sequence and the associated quality score).
+Need to make reads and keep track of their position, perhaps using a dictionary
+Need to verify that bowtie2 will accept my reads and perform alignments (might need quality scores)
+Think about to report the "worst" fits for alignments. Try mapping in order and then returning areas
+that don't map to iteratively find more alignments. This will let me construct synteny blocks
+(blocks of sequences that either rearranged or did not).
