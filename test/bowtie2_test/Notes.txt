@@ -52,3 +52,16 @@ Need to verify that bowtie2 will accept my reads and perform alignments (might n
 Think about to report the "worst" fits for alignments. Try mapping in order and then returning areas
 that don't map to iteratively find more alignments. This will let me construct synteny blocks
 (blocks of sequences that either rearranged or did not).
+
+
+Notes 12/07/21:
+Today I will write a script that makes reads from a sequence. Things to consider: Read length should be
+150 - 300 bp to represent Illumina reads. Paired-end (or maybe split?) reads will be created and I will
+test if Bowtie2 will make alignments with the reads in the file my script creates. Read coverage should
+be sufficient to allow variant discovery (so coverage should be high).
+What data will my program be using? Definitely needs to be able to take whole genome data,
+and smaller sizes if possible, though this is not the main goal.
+
+Keep this in mind:
+https://www.ecseq.com/support/ngs/why-do-the-reads-all-have-the-same-length-when-sequencing-differently-sized-fragments
+
