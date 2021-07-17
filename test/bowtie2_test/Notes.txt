@@ -65,3 +65,7 @@ and smaller sizes if possible, though this is not the main goal.
 Keep this in mind:
 https://www.ecseq.com/support/ngs/why-do-the-reads-all-have-the-same-length-when-sequencing-differently-sized-fragments
 
+17/07/21:
+Made script that can create reads in a fastA file (make_reads_fastA.py). Need to add randomized quality scores
+and test whether the reads map correctly to the original file. If this is successful, rearrangements will
+be introduced and the test will be performed again. 
