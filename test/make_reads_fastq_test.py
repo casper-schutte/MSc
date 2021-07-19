@@ -1,6 +1,5 @@
 from random import randint
 
-
 # This python script successfully takes a fastA file and creates reads according to set parameters
 # these reads are written to a fastA (.fa) file with the sequence name correlating numerically to the
 # order of the reads
