@@ -68,4 +68,28 @@ https://www.ecseq.com/support/ngs/why-do-the-reads-all-have-the-same-length-when
 17/07/21:
 Made script that can create reads in a fastA file (make_reads_fastA.py). Need to add randomized quality scores
 and test whether the reads map correctly to the original file. If this is successful, rearrangements will
-be introduced and the test will be performed again. 
+be introduced and the test will be performed again.
+
+19/0/21:
+The script was adapted to create reads in the fastQ (.fq) format with randomized quality scores. Obviously when
+working with real sequence data the quality scores will simply be extracted from the sequence file. The randomized
+scores are only there for initial testing purposes.
+
+21/07/21:
+The tests were successful. The reads (test_fastq.fq) mapped correctly to the original sequence (lambda_virus.fa)
+using Bowtie2. Tests where 1 rearrangement was introduced (a deletion of 70bp) resulted in 2 reads (spanning the
+deletion) clearly not mapping, evident from the CIGAR string in the alignment file (SAM file). Additionally, 2
+70bp sequences were switched (reciprocal transposition) and again, the SAM alignment file clearly highlighted these
+areas as not mapping correctly. The first test mapped reads from the unchanged genome to one I had changed as
+described in this paragraph.
+A test will now be performed where reads are taken from the altered sequenced (lambda_virus_re.fa) and mapped
+onto the unaltered one (lambda_virus.fa).
+The test returned the same results; the 3 alterations are clearly visible in the alignment file.
+NB: SAMtools has documentation (bookmarked) has many useful options for arguments for returning specific
+alignments and reads. Read up on it again.
+
+Think about where to go now. Can a program use just this alignment to identify borders or (more likely)
+will a program: change the output, look more closely at the regions that did not map and try to re-align them,
+perhaps both? Many papers I have read describe ways of doing this (sort of...)
+Need a way to visualize the output, to make testing and tweaking much easier. Look into samtools or
+bcftools for this.
