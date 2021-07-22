@@ -93,3 +93,14 @@ will a program: change the output, look more closely at the regions that did not
 perhaps both? Many papers I have read describe ways of doing this (sort of...)
 Need a way to visualize the output, to make testing and tweaking much easier. Look into samtools or
 bcftools for this.
+
+22/07/21:
+    - IDEA:
+    - Align the reads to the full sequence in bowtie2 (room for tweaks in parameters and settings)
+    - Return areas where reads did not map (according to a confidence level or user-defined sensitivity)
+        - Can look at the CIGAR string, and the quality scores for example.
+    - Re-align these areas to the genome locally, perhaps making smaller reads or split-reads out of the
+        long reads.
+
+Basically: return the sections of the alignment that do not match and try to locally map them find borders
+of rearrangements
