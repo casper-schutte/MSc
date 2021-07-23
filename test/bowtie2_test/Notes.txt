@@ -103,4 +103,9 @@ bcftools for this.
         long reads.
 
 Basically: return the sections of the alignment that do not match and try to locally map them find borders
-of rearrangements
+of rearrangements. Very important to continue considering choices will be made regarding
+confidence values and statistics. Think about how to incorporate the quality scores from any sources
+of uncertainty.
+
+23/07/21:
+Today: will make a new flow diagram that describes my experiment going forward.

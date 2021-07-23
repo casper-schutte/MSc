@@ -1,5 +1,6 @@
 from random import randint
 
+
 # This python script successfully takes a fastA file and creates reads according to set parameters
 # these reads are written to a fastA (.fa) file with the sequence name correlating numerically to the
 # order of the reads
@@ -49,7 +50,8 @@ def reads_to_file(reads):
     input: a list of reads
     output: a fastA file containing the reads and their number
     """
-    my_file = open("test_fastq.fq", "w")
+    #   Change the name of the file in the line below to keep track of files
+    my_file = open("test_fastq_re.fq", "w")
     read_num = 1
 
     for x in reads:
@@ -62,7 +64,6 @@ def reads_to_file(reads):
         my_file.write(str(qual_list) + "\n")
         read_num += 1
 
-
     my_file.close()
 
     print("done writing reads to file")
@@ -71,10 +72,7 @@ def reads_to_file(reads):
 # remember that the actual reads will have associated quality scores
 
 
-# This might be redundant, investigate using biopython to make reads
-
-
 if __name__ == "__main__":
-    h = get_seq("lambda_virus.fa")
+    h = get_seq("lambda_virus_re.fa")
     j = get_reads(h)
     k = reads_to_file(j)
