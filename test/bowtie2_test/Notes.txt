@@ -108,4 +108,3 @@ confidence values and statistics. Think about how to incorporate the quality sco
 of uncertainty.
 
 23/07/21:
-Today: will make a new flow diagram that describes my experiment going forward.

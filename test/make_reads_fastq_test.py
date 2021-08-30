@@ -2,8 +2,8 @@ from random import randint
 
 
 # This python script successfully takes a fastA file and creates reads according to set parameters
-# these reads are written to a fastA (.fa) file with the sequence name correlating numerically to the
-# order of the reads
+# these reads are written to a fastQ (.fq) file with the sequence name correlating numerically to the
+# order of the reads. Quality scores are randomized because the data is simulated for testing.
 
 def get_seq(genome):
     """
@@ -51,7 +51,7 @@ def reads_to_file(reads):
     output: a fastA file containing the reads and their number
     """
     #   Change the name of the file in the line below to keep track of files
-    my_file = open("test_fastq_re.fq", "w")
+    my_file = open("test_fastq.fq", "w")
     read_num = 1
 
     for x in reads:
@@ -73,6 +73,6 @@ def reads_to_file(reads):
 
 
 if __name__ == "__main__":
-    h = get_seq("lambda_virus_re.fa")
+    h = get_seq("lambda_virus.fa")
     j = get_reads(h)
     k = reads_to_file(j)

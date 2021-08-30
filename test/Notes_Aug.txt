@@ -1,0 +1,45 @@
+12/08/21:
+Have spent time familiarising myself with BW transform and FM indexing
+Have read through the code sent by Prof Patterton (CIGAR string manipulation)
+Will integrate this code into my own, such that CIGAR strings and quality scores can be called by the program.
+
+Made rearrangements to the original lambda_virus file. Replaced 2 lines (140 characters) with repeating "A" around line
+290 - 300. Will map reads from the original to the altered lambda_virus_reA.fa
+
+
+13/08/21:
+    - First thing I want to do is integrate the code from Prof with my own.
+    - I want to be able to return the read and position of mismatches. First need to be able to call
+        CIGAR strings from the SAM file. This will mean making changes to the script.
+    - Testing this today
+
+
+25/08/21:
+    - Have been sick but spent a lot of time thinking about the problem.
+        I would like my alignment to not even return the reads that match to save memory space and time
+        but this might not be a concern as it might still be fast enough. If it takes 3 minutes instead
+        of 2, this might be acceptable. Keep this in mind if the problem becomes more computationally
+        intensive.
+
+    - Use list comprehension whenever you use lists in for-loops. Can greatly increase efficiency this way.
+
+
+30/08/21:
+    TEST results (more rigorous test to come):
+    - I made a number of rearrangements in the genome and mapped non-rearranged reads using the current testing
+        protocol (default settings, 150bp reads, 50 bp overlap on either side). Generated a SAM file (eg1.sam)
+        and changed Prof's code to return only read names and mapping quality for reads that mapped under the
+        maximum quality observed in the SAM file. The test was successful, all 13 reads that did not have a
+        mapping quality of 42 were returned along with the read name. Importantly, not ALL the reads that were
+        rearranged were returned BUT the other reads (which mapped accurately) can be identified by the position
+        they mapped to, since they break the sequence; they map to a far away position, instead of
+        [read_length - overlap] bp away.
+
+        e.g. of output: [['r34', 0], ['r41', 8], ['r42', 0], ['r265', 8], ['r266', 0], ['r393', 40], ['r394', 0],
+         ['r395', 0], ['r396', 0], ['r397', 0], ['r398', 0], ['r399', 0], ['r486', 1]]
+
+
+    - Need to perform another experiment where I keep track of the rearrangements, and see if they are all returned.
+    - Return the position of the read as well.
+    - For the lowest mapping qualities, return them and perform a local alignment to distinguish where the borders
+        actually are.
