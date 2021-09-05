@@ -1,0 +1,17 @@
+Experiment 3 part 2:
+	Aim: Test calling reads that do not map well due to rearrangements in the genome
+	
+	Will be using the lambda phage genome included with Bowtie2 and introduce rearrangements.
+	Bowtie2 will be used to map generated reads from the unchanged genome onto the one 
+	with rearrangements, and vice versa.
+	
+	One large rearrangement will be made and the python script will be adjusted to 
+	attempt to identify the mismatching reads. The reads that do not match will be 
+	returned and a local alignment will be performed.
+
+	Rearrangement:
+	12 lines (59 to 70) were moved to line 100. Total 840 bp
+	
+	
+    Reads will be constructed from the rearranged genome with the python script and
+    mapped onto the unchanged genome. This process will be repeated reciprocally.
