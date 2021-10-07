@@ -14,4 +14,62 @@ Experiment 3 part 2:
 	
 	
     Reads will be constructed from the rearranged genome with the python script and
-    mapped onto the unchanged genome. This process will be repeated reciprocally.
+    mapped onto the unchanged genome.
+
+    Results:
+    The python script "main_copy.py" returned reads grouped together if they were consecutive.
+    In this way, rearranged reads can be identified grouped together as synteny blocks, either
+    having moved or having stayed un-rearranged. This script does not use mapping quality,
+    relying solely on the positions of the reads in the genome they originate from.
+
+    [(1, 3801), (4841, 6741), (3977, 4671), (6901, 48401)] is an example of what the output looks
+    like. The original order is clearly [1, 3, 2, 4]. A transposition occurred.
+    However, this result gives no detailed information about the positions of the borders beyond
+    their approximate position within the genome. Perhaps combining this information with the
+    reads that had low mapping quality can inform on where to accurately align the reads as to
+    delineate the exact borders of rearrangements.
+
+    13/09/21:
+    How am I going to find the exact breakpoints? Will a read containing a breakpoint necessarily
+    map badly? I think so. So select the reads that both map badly AND represent the borders of continuous
+    blocks. Then the CIGAR string can be called and a more accurate list of synteny blocks can be created.
+
+
+    17/09/21:
+    Making a large deletion and testing whether the borders can be easily found again. Are the badly mapping
+    reads still representative of the breakpoints?
+    Made a large deletion, from line 350 to line 365
+    Made reads from the original sequence using the python script.
+
+
+    20/09/21:
+    Made a large reversal in lines 500 - 510
+    Will map reads from the original seq to the reversed one, and vice versa.
+
+    In all tests performed, the reads containing breakpoints were easily identified. The SAM output files
+    were stored in the folder "experiment 3 results" in respective sub-folders.
+
+    One more test will be performed, where a rearrangement includes the start or end of the genome.
+    Moved lines 2 - 7 to lines 30 - 35.  (remember that line 1 is the sequence name and other information.)
+
+    Will map reads from the unchanged genome onto the changed one, and vice versa.
+
+    Results: The borders can still be found. BUT Bowtie is not showing all the reads that did not map properly
+    because there are reads that are clipped still have a high quality score. This needs to be changed somehow.
+    Upon reevaluation, the high mapping quality does not make a difference (as far as I can see). Even if Bowtie
+    is being too lenient on one of the reads because the border is so close to the end, the other read that contains
+    the border still maps badly enough to get returned by the python script. This is thanks to the overlapping
+    reads, if a border is very close to the end of the read, it will be far enough away from the end of the other
+    read to be identified as not mapping properly.
+
+    23/09/21:
+    Will create a script that takes into account both the position AND mapping quality of reads. This function
+    could look at the CIGAR string of reads that represent a border of continuity and mapped badly. This should
+    help me to identify the border of rearrangement at a base-pair level.
+    I will also read the Bowtie2 manual to get in-depth understanding of how the score is calculated.
+
+
+    26/09/21:
+    I am writing the script mentioned above. It can return the CIGAR string and position of a read.
+    I will look for real-world data to test it on and test whether the script can function when there are
+    multiple chromosomes.

@@ -13,24 +13,13 @@ def get_seq(genome):
     """
     a = open(genome)
     b = a.readlines()
-    # c = b[1:(len(b)) - 1]
-    z = []
-    chrm_counter = 0
-    for i in b:
-        if i.startswith(">"):
-            if chrm_counter < 1:
-                chrm_counter += 1
-                pass
-            else:
-                z.append(i[0])
-        else:
-            z.append(i)
+    c = b[1:(len(b)) - 1]
     # the 1 excludes the sequence name in the seq file
     d = []
-    for x in z:
+    for x in c:
         d.append(x.strip("\n"))
     full_seq = "".join(d[0:(len(d))])
-    # full_seq = full_seq.replace(">", "\n")
+
     return full_seq
 
 
@@ -40,35 +29,19 @@ def get_reads(seq_file):
     input: The full sequence as a string
     output: list of reads
     """
-    my_reads_f = []
-    my_reads_r = []
+    my_reads = []
     read_length = 150
     overlap = 50
-    read_pos_f = 0
-    read_pos_r = len(seq_file)
+    read_pos = 0
 
-    while (read_pos_f + (len(seq_file) - read_pos_r)) < len(seq_file):
-        my_reads_f.append(seq_file[read_pos_f:read_pos_f + read_length])
-        my_reads_r.append(seq_file[read_pos_r - read_length: read_pos_r])
-        read_pos_f += read_length - overlap
-        read_pos_r -= read_length - overlap
-        # print(read_pos_f + len(seq_file) - read_pos_r)
+    # have verified that the data written to file is the same that was from the sequence.
+    # now make the reads
 
-    # The code above builds read from the sequence, from the front and the end simultaneously.
-    print(read_pos_f, read_pos_r, read_pos_r + read_pos_f, len(seq_file))
-    # print(my_reads_f + my_reads_r[::-1])
-    return my_reads_f + my_reads_r[::-1]
+    while read_pos < len(seq_file):
+        my_reads.append(seq_file[read_pos:read_pos + read_length])
+        read_pos += read_length - overlap
 
-
-"""
-    read_pos1 = 0
-    my_reads1 = []
-    while read_pos1 < len(seq_file):
-        my_reads1.append(seq_file[read_pos1:read_pos1 + read_length])
-        read_pos1 += read_length - overlap
-
-    print(my_reads1)
-"""
+    return my_reads
 
 
 def reads_to_file(reads):
@@ -78,7 +51,7 @@ def reads_to_file(reads):
     output: a fastA file containing the reads and their number
     """
     #   Change the name of the file in the line below to keep track of files
-    my_file = open("exp4.fq", "w")
+    my_file = open("lambda_reads.fq", "w")
     read_num = 1
 
     for x in reads:
@@ -100,6 +73,6 @@ def reads_to_file(reads):
 
 
 if __name__ == "__main__":
-    h = get_seq("lambda_virus_exp4.fa")
+    h = get_seq("lambda_virus.fa")
     j = get_reads(h)
     k = reads_to_file(j)

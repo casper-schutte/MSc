@@ -2,7 +2,7 @@ from class_SAM import SAM
 import numpy as np
 
 file = SAM()
-filepath = 'exp3_local.sam'
+filepath = 'exp4.sam'
 number = file.ReadSAMFile(filepath)
 
 
@@ -18,7 +18,8 @@ def check_qual():
 
     qual_list = []
     for i in range(number):
-        qual_list.append([file.GetField(i, 'QNAME'), int(file.GetField(i, 'MAPQ')), int(file.GetField(i, 'POS'))])
+        qual_list.append([file.GetField(i, 'QNAME'), int(file.GetField(i, 'MAPQ')), int(file.GetField(i, 'POS')),
+                          file.GetField(i, 'RNAME')])
 
     bad_mapq = []
 
@@ -63,16 +64,17 @@ def find_border(quals, con_blocks):
     for j in quals:
         for k in my_blocks:
             if k == j[2]:
-                my_borders.append((k, j[0]))
+                my_borders.append((k, j[0], j[3]))
+                # my_borders.append((k, j[0]))
+
+                # This last line adds the edge of a consecutive block (k), the read name/number (j[0])
+                # and the chromosome/sequence name j[3].
 
     print(my_borders)
     return my_borders
 
 
 if __name__ == "__main__":
-
     a = check_qual()
     b = find_consecutive_blocks()
     c = find_border(a, b)
-
-
