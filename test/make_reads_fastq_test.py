@@ -11,27 +11,21 @@ def get_seq(genome):
     input: fastA (.fa) file
     output: string
     """
+
     a = open(genome)
-    b = a.readlines()
-    # c = b[1:(len(b)) - 1]
+    b = (a.read()).split(">")
     z = []
-    chrm_counter = 0
-    for i in b:
-        if i.startswith(">"):
-            if chrm_counter < 1:
-                chrm_counter += 1
-                pass
-            else:
-                z.append(i[0])
-        else:
-            z.append(i)
-    # the 1 excludes the sequence name in the seq file
+    for x in b[1:]:
+        z.append(x[x.index("\n") + 1:])
     d = []
+    print(z)
     for x in z:
-        d.append(x.strip("\n"))
-    full_seq = "".join(d[0:(len(d))])
+        d.append(x.replace("\n", ""))
+
+    # full_seq = "".join(d[0:(len(d))])
+    print(d)
     # full_seq = full_seq.replace(">", "\n")
-    return full_seq
+    return d
 
 
 def get_reads(seq_file):
@@ -56,7 +50,7 @@ def get_reads(seq_file):
 
     # The code above builds read from the sequence, from the front and the end simultaneously.
     print(read_pos_f, read_pos_r, read_pos_r + read_pos_f, len(seq_file))
-    # print(my_reads_f + my_reads_r[::-1])
+    print(my_reads_f + my_reads_r[::-1])
     return my_reads_f + my_reads_r[::-1]
 
 
@@ -81,15 +75,16 @@ def reads_to_file(reads):
     my_file = open("exp4.fq", "w")
     read_num = 1
 
-    for x in reads:
-        my_file.write("@r" + str(read_num) + "\n")
-        my_file.write(str(x) + "\n")
-        my_file.write("+" + "\n")
+    for y in reads:
+        for x in y:
+            my_file.write("@r" + str(read_num) + "\n")
+            my_file.write(str(x) + "\n")
+            my_file.write("+" + "\n")
 
-        qual_list = "".join(chr(randint(33, 126)) for y in range(len(x)))
+            qual_list = "".join(chr(randint(33, 126)) for y in range(len(x)))
 
-        my_file.write(str(qual_list) + "\n")
-        read_num += 1
+            my_file.write(str(qual_list) + "\n")
+            read_num += 1
 
     my_file.close()
 
@@ -100,6 +95,8 @@ def reads_to_file(reads):
 
 
 if __name__ == "__main__":
-    h = get_seq("lambda_virus_exp4.fa")
-    j = get_reads(h)
+    h = get_seq("lambda_virus.fa")
+    j = []
+    for i in h:
+        j.append(get_reads(i))
     k = reads_to_file(j)
