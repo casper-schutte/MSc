@@ -1,0 +1,21 @@
+
+01/11/21:
+    - Have 2 weeks to finish all the coding so that I have 6 weeks to write up.
+
+    - To do:
+        1) Fix the code, it cannot handle the positions resetting for different chromosomes.
+
+        2) Test the algorithm/tool on real data
+
+        Sounds easy, but I have not been able to do either.
+
+    - I can't start testing on real data because the algorithm might change. So the priority is fixing the code.
+        The problem is that when the consecutive blocks are calculated, they are not associated with the read
+        name or number. In the previous iteration of the script, position (relative to the reference) was unique.
+        Now, with the introduction of multiple chromosomes, the positions are no longer unique. Thus, I need to change
+        the way the consecutive blocks are located or find a way to keep additional data such that the blocks are still
+        identifiable.
+
+    - One way I can overcome the problem is by using a different algorithm to return nonconsecutive blocks. I like the
+        algorithm. The other way is to try to keep track of the read name while using the same algorithm. I will try
+        the latter first.

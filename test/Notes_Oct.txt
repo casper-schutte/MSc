@@ -44,3 +44,45 @@
         reads. This allows the construction of reads from seq files that contain multiple chromosomes without the
         border between chromosomes being flagged as a breakpoint. This means I can now test rearrangements between
         different chromosomes, and then test the algorithm on real data as well.
+
+18/10/21:
+    - After a lot of searching for real data and a lot of testing, there might be something wrong with the script.
+        Sometimes, especially when dealing with multiple chromosomes, the same read is returned multiple times.
+        I am in the process of tracking down this bug. I think it has to do with the way I implemented the program
+        handling multiple chromosomes, and the position resetting to 1 at the start of each chromosome.
+
+    - I found potential real data to use, the E. coli strains K12 and BL21. The genomes are large (not really, but
+        compared to my artificial genomes they are). After initial tests, the python script "find_borders.py" prints
+        the same read many, many times. NB: Ctrl + f and search if multiple copies of that read exist in the SAM file,
+        if there is only one, the problem is AFTER alignment, if there are multiple, the problem is BEFORE alignment.
+
+
+20/10/21:
+    - Have been investigating where the error is coming from. Decided to back to the start and test everything
+        methodically. Have also been practicing my Python skills, making sure I understand how to code efficiently.
+        Need to go back to the code and test it using small genomes. Need to write some sort of check for quality
+        scores to align fastA files that don't have them.
+    - So far it seems that the code will change from what I had in mind originally. It is now clear that I will have
+        to look at more than the quality score and the CIGAR string. I need to look at the "AS:" field, find out how.
+
+26/10/21:
+    - Have been looking at the code that returns the same read so many times. I now think it has to do with my script
+        not stopping at the correct time when the sequences are short. This points to the algorithm that makes reads
+        from the start and from the end of the file simultaneously as being the problem.
+
+    - Note to self:
+        If someone says "I've tried X" or "I've searched for Y", DO NOT BELIEVE THEM! Try yourself.
+
+28/10/21:
+    - So very many distractions. Moving the apartments, helping Dr Albonico, helping Shan set up her exhibit. Need to
+        get back on track. Have limited time.
+
+    - I found the problem. It lies in the fact that I flatten the list of consecutive blocks (or rather their positions
+        in the scrip "find_borders.py". The method that workded perfectly fine when there used to be unique positions
+        no longer works because with the introduction of multiple chromosomes there are no longer unique positions.
+        How to get around this?
+
+29/10/21:
+    - Have spent the day doing nothing but trying to fix the code. Currently, I am trying to use itertools.
+
+    - Nothing is working, I may have to tackle this problem a different way.
