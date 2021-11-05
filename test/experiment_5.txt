@@ -1,0 +1,58 @@
+
+Experiment to test the adapted algorithm on the normal rearrangements.
+Will first be tested on uni-chromosomal test data, followed by multi-chromosomal test data.
+Finally, if the results are good and no more changes are necessary, the algorithm will be tested on real data in a
+future experiment.
+
+Experiment 5.1:
+    Will map genomes with rearrangements onto the unchanged lambda virus genome
+    - Translocation: exp5_1.sam, exp5_2.sam, exp5_3.sam
+        Middle to middle:
+            Visually the alignment worked, can the algorithm return the correct borders?
+            RESULT: The script "consecutive_block_test.py" ALONE was able to detect each border. In this case using the
+                quality score was not even necessary, but will definitely be helpful to investigate edge cases and even
+                to apply some statistical treatment.
+
+        Middle to end:
+            Worked again. The consecutive blocks are clearly identified.
+
+        Middle to front:
+            Worked again.
+
+
+Experiment 5.2:
+
+    - Deletion and Insertion:
+        Deletion from middle:
+        - 2 deletions were made.
+            Result: Borders were easily identifiable
+
+        Insertion into middle:
+        - Testing the exact same files but mapping reciprocally.
+            Result: Worked better than expected. Not only are the borders clearly visible, but it is also
+                evident which borders belong to the insertion. They are returned as a consecutive block
+                that starts at position 0 and ends at position 0. This is good.
+
+        Deletion from start AND middle:
+            Result: Only 1 continous block is returned, but it is evident from the positions that the end and
+            the middle have both been deleted.
+
+        Insertion at start AND middle:
+            (reciprocal mapping of the same files)
+            Result: 3 blocks are returned, clearly showing where the reads do not map (the inserted sequences).
+
+Experiment 5.3:
+
+    - Reversal/inversion:
+        In middle:
+            Result: The borders are returned with no problems. However, there is no difference in the way the borders
+                are returned compared to insertion, because to the mapping algorithm there is no difference. All that
+                is detectable is that some reads did not map anywhere. This might need to change.
+        Reciprocal map (middle):
+            Result: The EXACT same borders are returned. I am tempted to say that I can identify inversion (reversal
+                of a sequence) by reciprocally mapping and seeing which borders are shared (exactly) between the two
+                genomes. However, Bowtie2 uses random seeds when choosing where to start making alignments, so this
+                must be kept in mind for larger genomes with many rearrangements. Although this algorithm is intended
+                for use on very closely related species.
+        End of sequence:
+            Result: Exactly the same as previous, tested reciprocally.
