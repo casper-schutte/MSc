@@ -1,4 +1,7 @@
 """
+
+NOT MY CODE! NOT MY CODE! NOT MY CODE!
+
 Wrapper script for bowtie2-align and bowtie2-build with version control
 """
 import subprocess
