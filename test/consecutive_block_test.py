@@ -6,6 +6,10 @@ file = SAM()
 filepath = 'exp5_rev3_re.sam'
 number = file.ReadSAMFile(filepath)
 
+# This file is used to test the new algorithm for calculating continuous blocks
+# This algorithm will be incorporated into "find_borders.py" after testing. The method used in "find_borders.py" was
+# found to be lacking in flexibility.
+
 my_array = []
 read_nums = []
 my_chroms = []
@@ -19,11 +23,10 @@ def find_consecutive_blocks():
         my_array.append(int(file.GetField(i, "POS")))
         read_nums.append(file.GetField(i, "QNAME"))
         my_chroms.append((file.GetField(i, "RNAME")))
-        my_as.append(file.GetOPTValue(i, "AS"))
+        # my_as.append(file.GetOPTValue(i, "AS"))
         my_score.append(file.GetField(i, "MAPQ"))
     diffs = np.diff(my_array)
     iterable = []
-    borders = []
     pos = 0
     last_pos = 0
     while pos + 1 < len(my_array):
@@ -52,8 +55,8 @@ def find_consecutive_blocks():
     # return flat_list
 
     # there is a way to return the order as well, using the pos and arranging them consecutively.
-    # One can also tell if there was a reversal because the positions will be reversed (IF they map
-    # at all).
+    # In some cases, extra information can be obtained from the way the borders are returned. See the explanation in
+    # "experiment_5.txt" for details and examples on this.
 
 
 def abc(i):

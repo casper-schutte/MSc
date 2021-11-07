@@ -43,3 +43,10 @@ Made rearrangements to the original lambda_virus file. Replaced 2 lines (140 cha
     - Return the position of the read as well.
     - For the lowest mapping qualities, return them and perform a local alignment to distinguish where the borders
         actually are.
+        
+        
+31/08/21: Experiment 3
+	- Using lamba phage genome included with Bowtie2 as an example.
+	- Details recorded in "experiment_3.txt" (rearrangements made, Bowtie2 settings, results, etc)
+	- Will introduce 2 large rearrangements and one smaller one. 
+	- Will include results here.

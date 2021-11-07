@@ -1,8 +1,9 @@
-from class_SAM import SAM
 import numpy as np
 
+from class_SAM import SAM
+
 file = SAM()
-filepath = 'exp4.sam'
+filepath = 'chrom_test.sam'
 number = file.ReadSAMFile(filepath)
 
 
@@ -39,15 +40,31 @@ def find_consecutive_blocks():
     This function returns the read number and position of the first and last read in
     a consecutive block. These should correlate with synteny blocks
     """
+    my_test = []
     iterable = []
+    read_nums = []
+
     for i in range(number):
         iterable.append(int(file.GetField(i, 'POS')))
+
+    for i in range(number):
+        read_nums.append(file.GetField(i, "QNAME"))
+    for i in range(number):
+        my_test.append((int(file.GetField(i, 'POS')), file.GetField(i, 'QNAME')))
+
     my_seq = np.split(iterable, np.array(np.where(np.abs(np.diff(iterable)) > 100)[0]) + 1)
+
+    print(f"my_seq: {my_seq}")
+    # print(f"my_test: {my_test}")
     # This line returns reads in blocks that differ by no more than the read length minus
     # the overlap. In other words, the blocks that are returned can be thought of as
     # synteny blocks.
     # Change the "100" to "read length - overlap." This will distinguish consecutive
     # reads from nonconsecutive ones.
+
+    # for k, g in itertools.groupby(enumerate(iterable), ):
+    #   print map(itemgetter(1), g)
+
     blocks = []
     for s in my_seq:
         if len(s) > 1:
@@ -60,17 +77,19 @@ def find_consecutive_blocks():
 def find_border(quals, con_blocks):
     my_blocks = [y for z in con_blocks for y in z]
     # Flattens the list of borders
+    print(f"my blocks are: {my_blocks}")
     my_borders = []
     for j in quals:
         for k in my_blocks:
             if k == j[2]:
+                # This line needs to change, how to connect the correct blocks and bad maps?
+                # read num?
                 my_borders.append((k, j[0], j[3]))
-                # my_borders.append((k, j[0]))
 
                 # This last line adds the edge of a consecutive block (k), the read name/number (j[0])
                 # and the chromosome/sequence name j[3].
 
-    print(my_borders)
+    print(f"The borders are: {my_borders}")
     return my_borders
 
 

@@ -19,3 +19,25 @@
     - One way I can overcome the problem is by using a different algorithm to return nonconsecutive blocks. I like the
         algorithm. The other way is to try to keep track of the read name while using the same algorithm. I will try
         the latter first.
+
+02/11/21:
+    - Made a lot of progress today. The script "consecutive_block_test.py" is working well using the new method.
+        There are one or two kinks that might have to be worked out but I will integrate it into my code and test
+        different rearrangements. Then I will test using real data.
+    - One thing I need to do is figure out how to extract the "AS" field as this will likely help me to assign borders
+        more than just using the mapping quality (MAPQ). Since for FastA files there are reads that were clipped
+        but still had a perfect mapping score (uniqueness).
+
+03/11/21:
+    - Will conduct some tests today to verify how the adapted algorithm works with different kinds of rearrangements.
+        The results will be written up in "experiment_5.txt."
+    - First round of tests were successful. Will continue tomorrow.
+
+04/11/21:
+    - Will continue with the tests of the new script. As soon as that is done I can start testing real data.
+
+05/11/21:
+    - Continued with testing the script on artificial rearrangements. See "experiment_5.txt"
+
+06/11/21:
+    - Should be finishing experiments on artificial data. Might make changes on what and how things are returned.
