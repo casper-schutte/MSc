@@ -41,3 +41,7 @@
 
 06/11/21:
     - Should be finishing experiments on artificial data. Might make changes on what and how things are returned.
+
+07/11/21:
+    - Needed to make small changes. Results very good so far (see experiment_5.txt)
+    - Testing multichromosoma data, see experiment_6.txt
