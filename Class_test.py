@@ -1,7 +1,7 @@
 
 # Here I will test a class method for further manipulating the borders
 
-class ContBlock:
+class Block:
     def __init__(self, pos, chrom, read_name, score):
         self.pos = pos
         self.chrom = chrom
@@ -9,6 +9,10 @@ class ContBlock:
         self.score = score
 
 
-a = ContBlock(1, 'gi|9626243|ref|NC_001416.1|', 'r1', '44')
+a = Block(1, 'Chr2', 'r1', '44')
+b = Block(1501, 'Chr2', 'r16', '25')
+
 
 print(a.pos)
+
+print(b.chrom)
