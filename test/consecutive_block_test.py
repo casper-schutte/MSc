@@ -3,7 +3,7 @@ import numpy as np
 from class_SAM import SAM
 
 file = SAM()
-filepath = 'exp5_rev3_re.sam'
+filepath = 'exp6_dup2.sam'
 number = file.ReadSAMFile(filepath)
 
 # This file is used to test the new algorithm for calculating continuous blocks
@@ -50,10 +50,6 @@ def find_consecutive_blocks():
     for border in flat_list:
         print(border)
 
-    # print(flat_list[0][0][0])
-
-    # return flat_list
-
     # there is a way to return the order as well, using the pos and arranging them consecutively.
     # In some cases, extra information can be obtained from the way the borders are returned. See the explanation in
     # "experiment_5.txt" for details and examples on this.
@@ -61,7 +57,7 @@ def find_consecutive_blocks():
 
 def abc(i):
     # return [my_array[i], read_nums[i], my_chroms[i], my_as[i]]
-    return my_array[i], read_nums[i], my_score[i]
+    return my_array[i], my_chroms[i], read_nums[i], my_score[i]
 
 
 if __name__ == "__main__":
