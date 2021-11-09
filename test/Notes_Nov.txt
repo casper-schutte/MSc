@@ -47,4 +47,3 @@
     - Testing multichromosoma data, see experiment_6.txt
 
 08/11/21:
-    -
