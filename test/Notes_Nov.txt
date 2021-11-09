@@ -45,3 +45,6 @@
 07/11/21:
     - Needed to make small changes. Results very good so far (see experiment_5.txt)
     - Testing multichromosoma data, see experiment_6.txt
+
+08/11/21:
+    -
