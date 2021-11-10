@@ -22,7 +22,7 @@
 
 02/11/21:
     - Made a lot of progress today. The script "consecutive_block_test.py" is working well using the new method.
-        There are one or two kinks that might have to be worked out but I will integrate it into my code and test
+        There are one or two kinks that might have to be worked out, but I will integrate it into my code and test
         different rearrangements. Then I will test using real data.
     - One thing I need to do is figure out how to extract the "AS" field as this will likely help me to assign borders
         more than just using the mapping quality (MAPQ). Since for FastA files there are reads that were clipped
@@ -47,3 +47,17 @@
     - Testing multichromosoma data, see experiment_6.txt
 
 08/11/21:
+    - Finished experiment 6, see experiment_6.txt for results.
+    - Ecerything is working as it should.
+
+09/11/21:
+    - Need to incorporate the new algorithm with the full script, so that we can also look at reads that did
+        not map properly. These reads should correlate with the borders of rearrangements.
+
+10/11/21:
+    - Trying to fix the way that the algorithm deals with duplications. One of the duplicated pair of reads "maps" to
+        the right place but the other either does not or does map but in both cases the MAPQ is 1. I would like to
+        combine these reads with terrible quality scores into a single block (if they are continuous). This would
+        make the output much more clear.
+    - Decided it would be better if the borders and blocks were written to a .txt file instead of only being printed
+        in the terminal.
