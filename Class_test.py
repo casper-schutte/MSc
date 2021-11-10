@@ -1,4 +1,3 @@
-
 # Here I will test a class method for further manipulating the borders
 
 class Block:
@@ -12,7 +11,7 @@ class Block:
 a = Block(1, 'Chr2', 'r1', '44')
 b = Block(1501, 'Chr2', 'r16', '25')
 
+if __name__ == "__main__":
+    print(a.pos)
 
-print(a.pos)
-
-print(b.chrom)
+    print(b.chrom)
