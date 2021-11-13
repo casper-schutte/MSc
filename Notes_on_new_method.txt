@@ -1,0 +1,7 @@
+Date: 13/11/21
+I will be changing the way the reads are made in order to increase the coverage (number of times a
+base at a specific position appears in a read). This might increase the ability to pinpoint the
+rearrangement to a single base pair.
+
+This will probably change a lot of things about the code, but I will keep the current version of
+the files and scripts as they are.
