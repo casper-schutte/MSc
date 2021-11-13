@@ -2,8 +2,8 @@
 # these reads are written to a fastQ (.fq) file with the sequence name correlating numerically to the
 # order of the reads. Quality scores are randomized because the data is simulated for testing.
 
-filepath = "lv_mc_dup1.fa"
-read_file_name = "lv_reads_dup1.fa"
+filepath = "ecoli_bl21.fasta"
+read_file_name = "ecbl21_reads.fa"
 
 
 def get_seq(genome):
@@ -25,8 +25,6 @@ def get_seq(genome):
 
     return d
 
-# Change
-
 
 def get_reads(seq_file):
     """
@@ -37,7 +35,7 @@ def get_reads(seq_file):
     my_reads_f = []
     my_reads_r = []
     read_length = 150
-    overlap = 50
+    overlap = 140
     read_pos_f = 0
     read_pos_r = len(seq_file)
 
