@@ -66,4 +66,34 @@
     - Will be trying to change the way reads are generated
     - Changing the way Bowtie2 returns reads such that coverage is increased. Multiple reads will be constructed from
         the same start position but of different lengths.
-    - After filtering out
+    - Did not find a way to do this in Bowtie2, but Samtools can do it:
+
+    $ Samtools view -q (MAPQ below which reads are not returned) file_name.sam  > file_name.filtered.sam
+
+    - After filtering out the reads with very low MAPQ (1 or 0, which were the ones that did not map or were
+        duplicated), the real data proved too "noisy." My algorithm was too sensitive. Mapping single, slightly
+        overlapping reads to construct continuous blocks worked very well for the artificial data. However, the real
+        data proved much too noisy. Small differences in the genomes (and in the way reads happen to be mapped -
+        remember that Bowtie2 uses random seeds to start looking for alignments).
+
+    - I need to change the way reads are constructed. Multiple reads (of varying lengths) will be constructed from the
+        same starting position. This way, the reads will all map where the genomes are the same. Where there is a
+        breakpoint, the shorter reads should map but the longer ones map less and less well. This way, small
+        differences will not be falsely returned as breakpoints. Instead, the longer (and further along) reads will
+        start mapping again, confirming the small change or single badly mapped read is not a breakpoint.
+
+    - We can make the reads overlap more, keeping the current method of construction and return, but I think that
+        a more accurate method would use reads of a variable length.
+
+    - Kept the read length at 150 bp, but made the overlap 140. Tested on the e. coli strains bl21 and k12. The
+        result is a massive SAM file (188 MB !). Visually, this file is hard to go through but borders of what seem
+        to be rearrangements are clear. The positional change is only 10bp, so it is very clear where subsequent reads
+        do not map as well as the previous ones. It is also very clear where reads begin to map again. Small
+        differences in the genome that are (likely) not rearrangement breakpoints are clearly identified as well
+        since the reads quickly begin mapping properly again.
+
+    - Pay attention to the bitwise flags (2nd column) in the SAM file as well. With this new alignement, I noticed
+        some valuable information in this field that was not apparent in my small tests.
+
+    - Need to find a "sweet spot" for read length and overlap. Consistent read positions might not matter as much
+        now, so perhaps we can use variable length. We will see how further tests go.
