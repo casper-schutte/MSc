@@ -61,3 +61,8 @@
         make the output much more clear.
     - Decided it would be better if the borders and blocks were written to a .txt file instead of only being printed
         in the terminal.
+
+13/11/21:
+    - Will be trying to change the way reads are generated
+    - Changing the way Bowtie2 returns reads such that coverage is increased. Multiple reads will be constructed from
+        the same start position but of different lengths.
