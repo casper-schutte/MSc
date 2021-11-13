@@ -25,6 +25,8 @@ def get_seq(genome):
 
     return d
 
+# Change
+
 
 def get_reads(seq_file):
     """

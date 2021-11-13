@@ -3,7 +3,7 @@ import numpy as np
 from class_SAM import SAM
 
 file = SAM()
-filepath = 'exp5_dup1.sam'
+filepath = 'exp5_dup2.sam'
 output_file_name = "result_exp5_dup1.txt"
 number = file.ReadSAMFile(filepath)
 
@@ -48,28 +48,57 @@ def find_consecutive_blocks():
 
     flat_list = [y for z in iterable for y in z]
 
-    for border in flat_list:
-        print(border)
+    print(flat_list)
+    pos_in_list = 0
+    current_read = None
+    for reads in flat_list:
+        print(reads[0], reads[1])
+        # for read in border:
+        pos_in_list += 1
+        if reads[0][3] == "1" or reads[0][3] == "0":
+            reads[0][0] = "*"
+            reads[0][1] = "*"
+            reads[0][3] = "*"
+        if reads[1][3] == "1" or reads[1][3] == "0":
+            reads[1][0] = "*"
+            reads[1][1] = "*"
+            reads[1][3] = "*"
+        if reads[1][3] == "*" and reads[0][3] == "*":
+            flat_list[(pos_in_list - 1)]
+
+        elif reads[0][2] == reads[1][2]:
+            flat_list.remove(flat_list[pos_in_list - 1])
+
+    print(pos_in_list)
 
     # there is a way to return the order as well, using the pos and arranging them consecutively.
     # In some cases, extra information can be obtained from the way the borders are returned. See the explanation in
     # "experiment_5.txt" for details and examples on this.
+
     return flat_list
 
 
 def get_fields(i):
     # return [my_array[i], read_nums[i], my_chroms[i], my_as[i]]
-    return my_array[i], my_chroms[i], read_nums[i], my_score[i]
+    # return [my_array[i], my_chroms[i], read_nums[i], my_score[i]]
+
+    return [my_array[i], "*", read_nums[i], my_score[i]]
+    # This cleans up returns when dealing with a unichromosomal organism
 
 
 def get_borders(blocks):
     mapped_badly = []
     for border in blocks:
         for read in border:
-            if 40 > int(read[3]) > 20:
+            if read == "*":
+                pass
+            elif read[3] == "*":
+                pass
+            elif 44 > int(read[3]) > 20:
                 # The score thresholds need to either be calibrated to the results or simply set by the user
                 # With long duplications, we get long blocks that are not continuous positionally but score very
                 # low (MAPQ = 1). This makes the returned "borders" and badly mapped reads very messy and confusing.
+                # A MAPQ of 20 indicates that the aligner calculates a 0.99 probability
                 mapped_badly.append(read)
     print(f"Reads containing borders: {mapped_badly}")
     return mapped_badly
@@ -82,8 +111,10 @@ def write_results_to_file(blocks, borders):
     for x in blocks:
         my_file.write(str(x) + "\n")
 
+    my_file.write("\n")
     my_file.write("Borders:" + "\n")
     for y in borders:
+        my_file.write("\n")
         my_file.write(str(y) + "\n")
 
 
