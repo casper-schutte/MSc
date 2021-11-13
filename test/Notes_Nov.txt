@@ -66,3 +66,4 @@
     - Will be trying to change the way reads are generated
     - Changing the way Bowtie2 returns reads such that coverage is increased. Multiple reads will be constructed from
         the same start position but of different lengths.
+    - After filtering out

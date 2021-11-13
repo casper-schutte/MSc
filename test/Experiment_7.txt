@@ -1,0 +1,14 @@
+
+Experiment 7:
+Experiment to test the algorithm on real data
+
+Tested with the e. coli strains k12 and bl21.
+The results are far too messy to make meaningful conclusions from them. The algorithm seems too sensitive.
+I will try to increase the coverage of the alignment (how many times a single base pair appears in reads).
+
+This will change the way that the script works, because using the array of the differences in position won't work.
+But with more reads of varying length starting from the same position, we should no longer need to test the
+continuity of the reads. Multiple reads should confirm the presence of a breakpoint and where it maps to, as the
+reads continue to progress through the sequence.
+
+This new method will be described in the "Notes_Nov.txt" file
