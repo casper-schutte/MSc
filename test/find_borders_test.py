@@ -55,17 +55,15 @@ def get_borders():
             f_temp_list.append([mapq[current_read], rocigar[current_read], pos[current_read]])
             f_counter += 1
 
-
         f_list[0].append(f_temp_list)
         print(r_temp_list)
 
     # print(r_list[::-1])
-    #print(f_list)
+    # print(f_list)
 
     borders = []
-    #for area in f_list:
+    # for area in f_list:
     #    print(area)
-
 
 
 # Consider just iterating through the list and
