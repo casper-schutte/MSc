@@ -3,7 +3,7 @@ import numpy as np
 from class_SAM import SAM
 
 file = SAM()
-filepath = 'exp7_2.sorted.sam'
+filepath = 'exp7_dup2.sorted.sam'
 number = file.ReadSAMFile(filepath)
 
 """
@@ -97,5 +97,5 @@ def write_to_file(breakpoints):
 if __name__ == "__main__":
     read_info = get_border_reads()
     find_breakpoints = get_borders(read_info)
-    file_name = "exp7_2.txt"  # Desired name for output file
+    file_name = "exp7_dup2.txt"  # Desired name for output file
     write_to_file(find_breakpoints)
