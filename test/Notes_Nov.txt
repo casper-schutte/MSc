@@ -161,3 +161,107 @@ Chr4 	 	 6110 	 	 r4678 	 	 21 	 32S68M
     - Can clearly see that multiple reads confirm the positions of breakpoints. Where there is disagreement, I can
         choose to trust the breakpoint that came from the read with the highest MAPQ or perhaps take the mode.
         This is to be determined.
+
+
+19/11/21:
+    - Will test the new method on different rearrangements. This method is different to the previous ones in that
+        continuity does not matter because the reads are generated from random starting positions. This means that
+        any rearrangement should be treated the same.
+        Reciprocal map of the previous experiment:
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr2 	 	 9171 	 	 r1693 	 	 44 	 86M14S
+Chr2 	 	 9171 	 	 r2113 	 	 41 	 77M23S
+Chr2 	 	 9171 	 	 r1768 	 	 41 	 76M24S
+Chr2 	 	 9171 	 	 r2455 	 	 36 	 69M31S
+Chr2 	 	 9171 	 	 r1959 	 	 36 	 66M34S
+Chr2 	 	 9171 	 	 r1664 	 	 24 	 55M45S
+Chr2 	 	 9171 	 	 r2668 	 	 24 	 50M50S
+Chr2 	 	 9171 	 	 r2091 	 	 22 	 43M57S
+Chr2 	 	 9171 	 	 r2631 	 	 22 	 35M65S
+Chr2 	 	 9171 	 	 r2396 	 	 22 	 29M71S
+Chr2 	 	 9186 	 	 r1681 	 	 42 	 15S85M
+Chr2 	 	 9205 	 	 r1807 	 	 36 	 34S66M
+Chr2 	 	 9232 	 	 r1813 	 	 22 	 61S39M
+Chr2 	 	 9194 	 	 r1948 	 	 41 	 23S77M
+Chr2 	 	 9188 	 	 r2351 	 	 42 	 17S83M
+Chr2 	 	 9230 	 	 r2528 	 	 22 	 59S41M
+Chr2 	 	 9193 	 	 r2630 	 	 41 	 22S78M
+Chr2 	 	 9183 	 	 r2763 	 	 44 	 12S88M
+Chr2 	 	 9193 	 	 r2812 	 	 41 	 22S78M
+Chr4 	 	 5602 	 	 r4823 	 	 42 	 79M21S
+Chr4 	 	 5602 	 	 r4416 	 	 41 	 78M22S
+Chr4 	 	 5602 	 	 r4318 	 	 36 	 69M31S
+Chr4 	 	 5602 	 	 r4425 	 	 24 	 51M49S
+Chr4 	 	 5602 	 	 r4130 	 	 22 	 34M66S
+Chr4 	 	 5602 	 	 r3892 	 	 22 	 28M72S
+Chr4 	 	 5643 	 	 r3777 	 	 28 	 42S58M
+Chr4 	 	 5635 	 	 r3823 	 	 36 	 34S66M
+Chr4 	 	 5645 	 	 r3958 	 	 24 	 44S56M
+Chr4 	 	 5632 	 	 r3993 	 	 36 	 31S69M
+Chr4 	 	 5646 	 	 r4453 	 	 24 	 45S55M
+Chr4 	 	 5655 	 	 r4482 	 	 22 	 54S46M
+Chr4 	 	 5632 	 	 r4761 	 	 36 	 31S69M
+
+    In both cases, the first border (the border where the deletion took place) is exactly the same. The second border
+    has a different position because one genome contains sequences that the other does not, due to deletions.
+    Of course, what is an insertion and what is a deletion is simply a matter of perspective.
+
+    It should not matter what kind of rearrangements are made, since we are only looking at reads that do not map.
+    The exception to this is duplication which will now be tested.
+
+    Single duplication:
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 4581 	 	 r1543 	 	 25 	 30S70M
+Chr1 	 	 4577 	 	 r1554 	 	 41 	 26S74M
+Chr1 	 	 4594 	 	 r1599 	 	 9 	     43S57M
+Chr1 	 	 4572 	 	 r2523 	 	 42 	 21S79M
+Chr1 	 	 4597 	 	 r2584 	 	 2 	     46S54M
+Chr1 	 	 4574 	 	 r2639 	 	 41 	 23S77M
+Chr1 	 	 5321 	 	 r2441 	 	 44 	 98M2S
+Chr1 	 	 5321 	 	 r2222 	 	 44 	 94M6S
+Chr1 	 	 5321 	 	 r2271 	 	 44 	 93M7S
+Chr1 	 	 5321 	 	 r1627 	 	 44 	 86M14S
+Chr1 	 	 5321 	 	 r1960 	 	 42 	 84M16S
+Chr1 	 	 5321 	 	 r1754 	 	 42 	 83M17S
+Chr1 	 	 5321 	 	 r2739 	 	 9 	     54M46S
+Chr2 	 	 5532 	 	 r1693 	 	 21 	 67M33S
+Chr2 	 	 5561 	 	 r1859 	 	 25 	 30S70M
+Chr2 	 	 5546 	 	 r2105 	 	 42 	 15S85M
+
+    Again, we see borders clearly identified. Duplications are a little bit more tricky. This information (the
+    position and MAPQ score) are enough to tell where the borders are. Perhaps not to a single base pair in ALL cases,
+    but it is clear that the higher the MAPQ score, the closer the positions of the breakpoints become.
+
+    I think an algorithm that uses the MAPQs as weights could be used to narrow down on the breakpoint.
+
+    Reciprocal map of the previous experiment:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr2 	 	 5532 	 	 r1516 	 	 44 	 92M8S
+Chr2 	 	 5532 	 	 r2691 	 	 41 	 74M26S
+Chr2 	 	 5532 	 	 r2098 	 	 16 	 62M38S
+Chr2 	 	 5532 	 	 r2083 	 	 2 	     52M48S
+Chr2 	 	 5532 	 	 r2363 	 	 2 	     52M48S
+Chr2 	 	 6333 	 	 r1668 	 	 21 	 32S68M
+Chr2 	 	 6307 	 	 r1877 	 	 44 	 6S94M
+Chr2 	 	 6341 	 	 r1984 	 	 12 	 40S60M
+Chr2 	 	 6319 	 	 r2009 	 	 42 	 18S82M
+Chr2 	 	 6312 	 	 r2018 	 	 44 	 11S89M
+Chr2 	 	 6327 	 	 r2578 	 	 41 	 26S74M
+Chr2 	 	 6315 	 	 r2602 	 	 44 	 14S86M
+Chr2 	 	 6345 	 	 r2745 	 	 9 	     44S56M
+
+    In this experiment, the only reads that were returned were the borders of the duplication. In the sorted SAM file
+    there are reads in between these that all have a mapping quality of 1. It might be useful look at these reads
+    as well because they would indicate the position the duplication originated from. Nevertheless, the script
+    identified all of the borders, and only the borders. Real data is much more noisy. This means that I need a
+    function that looks at how many times a potential border is contained in a read. A foreseeable problem is that
+    the reads do not report the exact same position for the border. So, how to filter out the noise reads and keep the
+    actual ones is my next problem.
+
+    Idea: Go through the reads, give each returned potential breakpoint a weight (probably based on MAPQ). The lower
+    the MAPQ, the more allowance on either side.
+
+    Read length and coverage need to be optimised. This could be left up to the user but it would be good to have a
+    default that would work in common use.
