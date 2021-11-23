@@ -12,3 +12,33 @@ continuity of the reads. Multiple reads should confirm the presence of a breakpo
 reads continue to progress through the sequence.
 
 This new method will be described in the "Notes_Nov.txt" file
+
+To see how the new adapted algorithm finds known breakpoints, it will once again be tested
+
+
+Experiment 7.1:
+    Testing the new algorithm on artificially rearranged (synthetic) genomes:
+    Made two translocations in the file "lv_mc.fa", this is the multichromosomal version of the synthetic lambda phage
+    genome. Saved the rearranged genome as "lv_mc_exp7_1". Made reads from the original and the rearranged genomes
+    (300 bp long, 250 bp overlap, position changes by 50 from one read to the next).
+
+    The plan is to change the script such that it looks for areas that mapped badly. It will look for reads that
+    map very badly (single digit MAPQ scores), it will then return the reads before and after the badly mapped one.
+    It will add the neighbouring reads to a list until the MAPQ has stabilized. The script will then look at the
+    CIGAR string and pinpoint the breakpoint.
+
+    My method still did not work. Trying a new method for constructing reads such that coverage is greatly increased.
+
+
+Experiment 7.2:
+    Made reads with a new algorithm, see "make _reads_fa.py" for details.
+    Tested by mapping the unchanged lambda virus genome onto itself (unchanged).
+    Sorted the SAM file and confirmed that all the reads map correctly to the genome.
+
+    Will introduce a rearrangement and test to see if the border can be identified.
+
+    Two deletions were made in lv_mc_exp7_2.fa. I will map reads made from this file to the unchanged genome.
+
+
+
+Decided to keep my notes in one place for better organization. See the Notes_{month}.txt files.
