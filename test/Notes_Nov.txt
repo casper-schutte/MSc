@@ -265,3 +265,43 @@ Chr2 	 	 6345 	 	 r2745 	 	 9 	     44S56M
 
     Read length and coverage need to be optimised. This could be left up to the user but it would be good to have a
     default that would work in common use.
+
+
+20/11/21:
+    - Thinking about how to group the borders. Given that the read length is 100, we definitely do not want to use
+        a read that maps the border more than 100 positions away.
+
+23/11/21:
+    - There are two strategies I am considering
+        1) Extend the border area around the breakpoint proportionately to how LOW the MAPQ is. This follows from the
+            observation that the lower the MAPQ, the further the border is assigned from the actual border. In other
+            words, if a border is assigned at 1105, with MAPQ of 44, the border will be extended by 1 bp on both sides
+            (or one side, look at the data). if another border is assigned at 1120, with a low MAPQ (10), we can
+            extend that 1120 on both sides by some number of base pairs.
+            We then look at the borders with the highest confidence and "back them up" by finding this position
+            in the extended borders of the borders with lower confidence.
+
+        2) The other strategy is to create an array of all the borders and then use Numpy.average(). This function
+            returns the average of the values in an array. When a second array is used in the argument, it is used
+            as a weight for each value. This would decrease the affect that borders with low confidence have
+            on the outcome.
+
+
+        A combination of these two strategies might work. I would get the borders that map in roughly the same area.
+        Take the border with the highest confidence as a starting point, then check if other borders fall in the same
+        region (allowing more extension for borders with bad MAPQ). I could then collect these and use these to get
+        the average (weighted). This will only really work if the "bad" borders are mapped to both sides. If they
+        are disproportionately to one side then this will pull the average away from the actual border.
+
+24/11/21:
+    - I have created a function in "find_borders_test.py" that separates the most confident breakpoints from
+        each other by looking at the positions. There is an allowance variable that allows the positions to differ
+        on either side by some integer. The high confidence borders are lists within lists. Borders that map very
+        well and are within (allowance) base pairs are in the same list.
+
+        I need to write another function or extend the current one in order to add the less confident breakpoints
+        to the lists.
+
+    - Done. Extended the function such that the borders that have lower mapq score are appended to the list containing
+        the higher mapq border, if they are within some distance (allowance variable). We can use the borders within
+        reads that had a MAPQ lower than the maximum to add confidence
