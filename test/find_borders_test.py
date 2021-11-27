@@ -1,9 +1,9 @@
-import numpy as np
+# import numpy as np
 
 from class_SAM import SAM
 
 file = SAM()
-filepath = 'exp7_dup2.sorted.sam'
+filepath = 'exp7_6.sorted.sam'
 number = file.ReadSAMFile(filepath)
 
 """
@@ -67,8 +67,8 @@ def get_borders(borders):
     for numbers in bps:
         matching.append("".join(numbers[0:]))
 
-    # print(matching)
-    # print(len(matching))
+    print(matching)
+    print(len(matching))
 
     breakpoints = []
     for m in enumerate(matching):
@@ -80,7 +80,7 @@ def get_borders(borders):
 
         else:
             breakpoints.append([
-                borders[m[0]][0], borders[m[0]][1] + read_len + int(m[1]), borders[m[0]][2], borders[m[0]][3],
+                borders[m[0]][0], borders[m[0]][1], borders[m[0]][2], borders[m[0]][3],
                 borders[m[0]][4], "-"
             ])
 
@@ -103,7 +103,7 @@ def refine_breakpoints(bp):
         # write a function that takes the mapq score into account, and extends the reads by the inverse of the MAPQ
         # Multiplied by some constant (optimize). In this way, we can statistically back up the position of the
         # breakpoint with multiple reads that map to the same area.
-        if read[3] > 43:
+        if read[3] > 40:
             # print(read)
             conf_borders.append(read)
         else:
@@ -133,17 +133,23 @@ def refine_breakpoints(bp):
     print(len(bp))
     done = []
     for border in nonconf_borders:
-        while border not in done:
+        if border not in done:
             for cb in border_areas:
                 print(f"cb: {cb}")
                 if border[1] - allowance <= cb[0][1] <= border[1] + allowance:
                     border_areas[border_areas.index(cb)].append(border)
                     done.append(border)
 
+    for border in nonconf_borders:
+        if border not in done:
+            border_areas.append([border])
+
     print(border_areas)
     print(len(border_areas[0]) + len(border_areas[1]))
 
     return border_areas
+
+    #
 
 
 def write_to_file(breakpoints):
@@ -158,7 +164,7 @@ def write_to_file(breakpoints):
 if __name__ == "__main__":
     read_info = get_border_reads()
     find_breakpoints = get_borders(read_info)
-    file_name = "exp7_test.txt"  # Desired name for output file
+    file_name = "exp7_6.txt"  # Desired name for output file
     # write_to_file(find_breakpoints)
     refined_breakpoints = refine_breakpoints(find_breakpoints)
     write_to_file(refined_breakpoints)
