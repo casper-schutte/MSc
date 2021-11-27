@@ -480,3 +480,89 @@ Chr4 	 	 10923 	 	 r3111 	 	 2 	     51M49S
     I have verified that the positions returned are NOT simply a bug or error that returns the same value. These
     positions are derived from the SAM file. These results are fantastic. There are so many reads that support the
     reads that map with high confidence.
+
+
+27/11/21:
+    - Will perform the same kind of test again. Again using the same test genome but with different rearrangements.
+    Experiment 7.5:
+    Rearrangements:
+    - Reversal
+        420bp from position 1 on chromosome 2, to position 420. 421 should be first mapping base in chromosome 2.
+
+    - Deletion
+        210 bp deleted from position 700 to 910 on chromosome 1. Should see borders at 700 and at 911
+
+    - Duplication
+        280 bp from position 1 on chromosome 4 were duplicated to the end of chromosome 4.
+
+Results: mapping rearranged onto original
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r957 	 	 44 	 87M13S
+Chr1 	 	 701 	 	 r280 	 	 42 	 17S83M
+Chr1 	 	 701 	 	 r798 	 	 42 	 21S79M
+Chr1 	 	 701 	 	 r895 	 	 28 	 62M38S
+Chr1 	 	 701 	 	 r114 	 	 22 	 49M51S
+Chr1 	 	 701 	 	 r737 	 	 22 	 42M58S
+Chr1 	 	 701 	 	 r96 	 	 22 	 28M72S
+Chr1 	 	 701 	 	 r698 	 	 22 	 57S43M
+Chr1 	 	 701 	 	 r785 	 	 22 	 54S46M
+Chr1 	 	 701 	 	 r1276 	 	 28 	 41S59M
+Chr1 	 	 701 	 	 r1328 	 	 36 	 35S65M
+Chr1 	 	 701 	 	 r1453 	 	 36 	 30S70M
+
+Chr2 	 	 421 	 	 r1932 	 	 41 	 25S75M
+Chr2 	 	 421 	 	 r2593 	 	 41 	 28S72M
+Chr2 	 	 421 	 	 r1471 	 	 22 	 61S39M
+Chr2 	 	 421 	 	 r1477 	 	 28 	 38S62M
+Chr2 	 	 421 	 	 r1595 	 	 22 	 61S39M
+Chr2 	 	 421 	 	 r1672 	 	 22 	 69S31M
+Chr2 	 	 421 	 	 r1784 	 	 22 	 54S46M
+Chr2 	 	 421 	 	 r2052 	 	 28 	 37S63M
+Chr2 	 	 421 	 	 r2118 	 	 36 	 32S68M
+Chr2 	 	 421 	 	 r2259 	 	 22 	 55S45M
+Chr2 	 	 421 	 	 r2775 	 	 22 	 65S35M
+
+The border for the deletion is correct. Need to check why it is off by 1 base. This could be a case of a base
+being replaced with the same base that used to be there. The other rearrangement and borders are  not clear from this
+result, but the reciprocal mapping should reveal them. The first border from the reversal is not shown, as there are
+no reads that map before position 421 on chromosome 2.
+
+Reciprocal map:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 911 	 	 r539 	 	 41 	 23S77M
+Chr1 	 	 911 	 	 r740 	 	 41 	 22S78M
+Chr1 	 	 911 	 	 r1057 	 	 44 	 4S96M
+Chr1 	 	 911 	 	 r1197 	 	 41 	 24S76M
+Chr1 	 	 911 	 	 r1314 	 	 42 	 17S83M
+Chr1 	 	 911 	 	 r1060 	 	 9 	     45S55M
+
+Chr2 	 	 421 	 	 r2301 	 	 44 	 14S86M
+Chr2 	 	 421 	 	 r1509 	 	 22 	 66S34M
+Chr2 	 	 421 	 	 r2782 	 	 22 	 67S33M
+
+Chr4 	 	 1 	 	     r4338 	 	 44 	 14S86M
+Chr4 	 	 1 	 	     r4348 	 	 44 	 11S89M
+Chr4 	 	 1 	 	     r4767 	 	 41 	 24S76M
+Chr4 	 	 1 	 	     r4771 	 	 44 	 5S95M
+Chr4 	 	 1 	 	     r4817 	 	 42 	 21S79M
+Chr4 	 	 1 	 	     r3768 	 	 25 	 31S69M
+Chr4 	 	 1 	 	     r4408 	 	 18 	 36S64M
+Chr4 	 	 1 	 	     r4715 	 	 9 	     45S55M
+
+Chr4 	 	 10773 	 	 r4804 	 	 25 	 69M31S
+
+Chr4 	 	 10773 	 	 r3878 	 	 21 	 66M34S
+
+Chr4 	 	 10773 	 	 r4064 	 	 16 	 62M38S
+
+Chr4 	 	 10773 	 	 r4077 	 	 22 	 33M67S
+
+
+Firstly, I need to go through the list of reads that are left over at the end and try to group them as well. There
+are no high confidence reads confirming the breakpoint at 10773 on chromosome 4, but with 4 adjusted reads pointing
+to the same place I think it should be included.
+
+The other deletion border is clear at position 911 on chromosome 1, exactly where it was predicted (made, rather).
+
+The reads that were part of the duplication are not immediately obvious. I need to spend some time trying to
+understand the return.
