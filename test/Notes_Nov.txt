@@ -305,3 +305,178 @@ Chr2 	 	 6345 	 	 r2745 	 	 9 	     44S56M
     - Done. Extended the function such that the borders that have lower mapq score are appended to the list containing
         the higher mapq border, if they are within some distance (allowance variable). We can use the borders within
         reads that had a MAPQ lower than the maximum to add confidence
+
+26/11/21:
+    - Result of algorithm:
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr2 	 	 5532 	 	 r1516 	 	 44 	 92M8S
+Chr2 	 	 5532 	 	 r2691 	 	 41 	 74M26S
+Chr2 	 	 5532 	 	 r2098 	 	 16 	 62M38S
+Chr2 	 	 5532 	 	 r2083 	 	 2 	     52M48S
+Chr2 	 	 5532 	 	 r2363 	 	 2 	     52M48S
+
+Chr2 	 	 6307 	 	 r1877 	 	 44 	 6S94M
+Chr2 	 	 6312 	 	 r2018 	 	 44 	 11S89M
+Chr2 	 	 6315 	 	 r2602 	 	 44 	 14S86M
+Chr2 	 	 6333 	 	 r1668 	 	 21 	 32S68M
+Chr2 	 	 6341 	 	 r1984 	 	 12 	 40S60M
+Chr2 	 	 6319 	 	 r2009 	 	 42 	 18S82M
+Chr2 	 	 6327 	 	 r2578 	 	 41 	 26S74M
+Chr2 	 	 6345 	 	 r2745 	 	 9 	     44S56M
+
+The borders with the highest confidence are extracted from the rest and then grouped by position. Then, the remaining
+borders are compared with the high confidence borders. If they are within an allowable distance from a high confidence
+border, they are added to the list.
+
+    - It is time to test on a different file with rearrangements in different places.
+        The multichromosomal test genome "lv_mc.fa" will be rearranged to include a deletion and a translocation.
+        The new file will be named "exp7_3.fa" and reads will be constructed from it and mapped reciprocally to the
+        original lv_mc.fa file. I will keep track of the positions of the breakpoints to evaluate the accuracy.
+
+    - (I still need to think of a way to report the total confidence.)
+
+    - Rearrangements: Deletion of 140 bp at position 1330 (up to position 1470) on chromosome 1.
+
+    - Translocation (150bp) from position 700 on chromosome 3 to end of chromosome 4
+
+Mapping:
+Rearranged onto original:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 1333 	 	 r356 	 	 44 	 99M1S
+Chr1 	 	 1333 	 	 r1038 	 	 44 	 93M7S
+Chr1 	 	 1333 	 	 r381 	 	 21 	 67M33S
+Chr1 	 	 1333 	 	 r726 	 	 21 	 67M33S
+Chr1 	 	 1333 	 	 r32 	 	 18 	 64M36S
+Chr1 	 	 1333 	 	 r302 	 	 16 	 62M38S
+Chr1 	 	 1333 	 	 r767 	 	 16 	 62M38S
+
+Chr1 	 	 1481 	 	 r627 	 	 44 	 10S90M
+Chr1 	 	 1489 	 	 r571 	 	 42 	 18S82M
+Chr1 	 	 1504 	 	 r662 	 	 21 	 33S67M
+Chr1 	 	 1519 	 	 r1121 	 	 2 	     48S52M
+Chr1 	 	 1501 	 	 r1126 	 	 25 	 30S70M
+Chr1 	 	 1511 	 	 r1216 	 	 12 	 40S60M
+
+Chr3 	 	 709 	 	 r4323 	 	 44 	 8S92M
+Chr3 	 	 701 	 	 r3460 	 	 42 	 83M17S
+Chr3 	 	 701 	 	 r3312 	 	 42 	 82M18S
+Chr3 	 	 701 	 	 r2979 	 	 41 	 73M27S
+Chr3 	 	 701 	 	 r3446 	 	 21 	 67M33S
+Chr3 	 	 701 	 	 r3591 	 	 9 	     55M45S
+Chr3 	 	 701 	 	 r3463 	 	 9 	     54M46S
+Chr3 	 	 722 	 	 r4245 	 	 42 	 21S79M
+Chr3 	 	 746 	 	 r4362 	 	 9 	     45S55M
+Chr3 	 	 717 	 	 r4755 	 	 42 	 16S84M
+
+Chr3 	 	 858 	 	 r3587 	 	 44 	 7S93M
+Chr3 	 	 883 	 	 r3160 	 	 25 	 32S68M
+Chr3 	 	 875 	 	 r3213 	 	 41 	 24S76M
+Chr3 	 	 892 	 	 r3471 	 	 12 	 41S59M
+
+Chr4 	 	 10773 	 	 r4340 	 	 44 	 88M12S
+
+
+Original mapped onto rearranged:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 1333 	 	 r701 	 	 44 	 99M1S
+Chr1 	 	 1333 	 	 r1293 	 	 44 	 93M7S
+Chr1 	 	 1342 	 	 r33 	 	 44 	 11S89M
+Chr1 	 	 1333 	 	 r558 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r745 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r842 	 	 22 	 49M51S
+Chr1 	 	 1333 	 	 r985 	 	 22 	 34M66S
+Chr1 	 	 1333 	 	 r1156 	 	 22 	 28M72S
+Chr1 	 	 1333 	 	 r1301 	 	 22 	 28M72S
+Chr1 	 	 1366 	 	 r337 	 	 36 	 35S65M
+Chr1 	 	 1356 	 	 r1040 	 	 41 	 25S75M
+
+Chr3 	 	 701 	 	 r3577 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3608 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3274 	 	 44 	 95M5S
+Chr3 	 	 701 	 	 r2973 	 	 44 	 94M6S
+Chr3 	 	 710 	 	 r3747 	 	 44 	 9S91M
+Chr3 	 	 701 	 	 r3477 	 	 25 	 71M29S
+Chr3 	 	 701 	 	 r2978 	 	 25 	 68M32S
+Chr3 	 	 701 	 	 r3502 	 	 21 	 67M33S
+Chr3 	 	 701 	 	 r3152 	 	 9 	     57M43S
+Chr3 	 	 701 	 	 r3520 	 	 2 	     53M47S
+Chr3 	 	 744 	 	 r3191 	 	 9 	     43S57M
+Chr3 	 	 719 	 	 r3213 	 	 42 	 18S82M
+Chr3 	 	 728 	 	 r3215 	 	 41 	 27S73M
+
+Chr4 	 	 10777 	 	 r3360 	 	 44 	 4S96M
+Chr4 	 	 10786 	 	 r3737 	 	 44 	 13S87M
+Chr4 	 	 10822 	 	 r3006 	 	 2 	     49S51M
+Chr4 	 	 10817 	 	 r3062 	 	 9 	     44S56M
+Chr4 	 	 10800 	 	 r3536 	 	 41 	 27S73M
+
+Chr4 	 	 10923 	 	 r2989 	 	 44 	 98M2S
+Chr4 	 	 10923 	 	 r3204 	 	 41 	 76M24S
+Chr4 	 	 10923 	 	 r3052 	 	 37 	 72M28S
+Chr4 	 	 10923 	 	 r3424 	 	 9 	     55M45S
+Chr4 	 	 10923 	 	 r3111 	 	 2 	     51M49S
+
+Chr1 	 	 1399 	 	 r485 	 	 22 	 68S32M
+
+Chr1 	 	 1389 	 	 r802 	 	 22 	 58S42M
+
+Chr1 	 	 1390 	 	 r1182 	 	 22 	 59S41M
+
+
+Discussion:
+    - I noticed something VERY IMPORTANT. I have overlooked an important detail. I noticed that for the reads that
+        start mapping and then stop (have M - for match before S - for soft-clipped) the correct positions are
+        returned for the breakpoints. In the other case where reads start with soft-clipped bases the positions are
+        off. This is because when a base is marked as soft-clipped, the position is NOT changed. This means that
+        I should not be adjusting the position of the reads in this case. I will change the script and check the
+        results.
+
+    - Changed script to NO LONGER adjust the position of the breakpoints that start out as soft-clipped.
+        Results:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 1333 	 	 r701 	 	 44 	 99M1S
+Chr1 	 	 1333 	 	 r1293 	 	 44 	 93M7S
+Chr1 	 	 1331 	 	 r33 	 	 44 	 11S89M
+Chr1 	 	 1333 	 	 r558 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r745 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r842 	 	 22 	 49M51S
+Chr1 	 	 1333 	 	 r985 	 	 22 	 34M66S
+Chr1 	 	 1333 	 	 r1156 	 	 22 	 28M72S
+Chr1 	 	 1333 	 	 r1301 	 	 22 	 28M72S
+Chr1 	 	 1331 	 	 r337 	 	 36 	 35S65M
+Chr1 	 	 1331 	 	 r485 	 	 22 	 68S32M
+Chr1 	 	 1331 	 	 r802 	 	 22 	 58S42M
+Chr1 	 	 1331 	 	 r1040 	 	 41 	 25S75M
+Chr1 	 	 1331 	 	 r1182 	 	 22 	 59S41M
+
+Chr3 	 	 701 	 	 r3577 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3608 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3274 	 	 44 	 95M5S
+Chr3 	 	 701 	 	 r2973 	 	 44 	 94M6S
+Chr3 	 	 701 	 	 r3747 	 	 44 	 9S91M
+Chr3 	 	 701 	 	 r3477 	 	 25 	 71M29S
+Chr3 	 	 701 	 	 r2978 	 	 25 	 68M32S
+Chr3 	 	 701 	 	 r3502 	 	 21 	 67M33S
+Chr3 	 	 701 	 	 r3152 	 	 9 	     57M43S
+Chr3 	 	 701 	 	 r3520 	 	 2 	     53M47S
+Chr3 	 	 701 	 	 r3191 	 	 9 	     43S57M
+Chr3 	 	 701 	 	 r3213 	 	 42 	 18S82M
+Chr3 	 	 701 	 	 r3215 	 	 41 	 27S73M
+
+Chr4 	 	 10773 	 	 r3360 	 	 44 	 4S96M
+Chr4 	 	 10773 	 	 r3737 	 	 44 	 13S87M
+Chr4 	 	 10773 	 	 r3006 	 	 2 	     49S51M
+Chr4 	 	 10773 	 	 r3062 	 	 9 	     44S56M
+Chr4 	 	 10773 	 	 r3536 	 	 41 	 27S73M
+
+Chr4 	 	 10923 	 	 r2989 	 	 44 	 98M2S
+Chr4 	 	 10923 	 	 r3204 	 	 41 	 76M24S
+Chr4 	 	 10923 	 	 r3052 	 	 37 	 72M28S
+Chr4 	 	 10923 	 	 r3424 	 	 9 	     55M45S
+Chr4 	 	 10923 	 	 r3111 	 	 2 	     51M49S
+
+    Discussion: Holy shit... it works.
+    I have verified that the positions returned are NOT simply a bug or error that returns the same value. These
+    positions are derived from the SAM file. These results are fantastic. There are so many reads that support the
+    reads that map with high confidence.
