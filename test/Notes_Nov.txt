@@ -566,3 +566,200 @@ The other deletion border is clear at position 911 on chromosome 1, exactly wher
 
 The reads that were part of the duplication are not immediately obvious. I need to spend some time trying to
 understand the return.
+
+
+30/11/21:
+    - Spoke to Prof and showed my results in the meeting today. Advice:
+        Do not use the term "adjusted position", instead refer to these as breakpoints or rearrangement borders.
+        I can use this laptop until the end of January.
+        There is a lot of work to be done.
+        Run more tests and figure out if there is way to make the duplications "look better"?
+
+    - Experiment 8:
+        - First, I will use the same two genomes from the previous experiment, but I will adjust the coverage and read
+            length, independently.
+
+    Experiment 8_1:
+        - Same genomes but will make reads of length 200.
+        Result: Rearranged mapped onto original
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r165 	 	 44 	 199M1S
+Chr1 	 	 701 	 	 r103 	 	 44 	 196M4S
+Chr1 	 	 701 	 	 r401 	 	 44 	 194M6S
+Chr1 	 	 701 	 	 r415 	 	 44 	 191M9S
+Chr1 	 	 701 	 	 r131 	 	 25 	 147M53S
+Chr1 	 	 701 	 	 r712 	 	 21 	 138M62S
+Chr1 	 	 701 	 	 r212 	 	 17 	 125M75S
+Chr1 	 	 701 	 	 r661 	 	 17 	 125M75S
+Chr1 	 	 701 	 	 r650 	 	 17 	 122M78S
+Chr1 	 	 701 	 	 r448 	 	 2 	     103M97S
+
+Chr1 	 	 911 	 	 r329 	 	 44 	 15S185M
+Chr1 	 	 911 	 	 r419 	 	 44 	 20S180M
+Chr1 	 	 911 	 	 r76 	 	 38 	 38S162M
+Chr1 	 	 911 	 	 r258 	 	 25 	 51S149M
+Chr1 	 	 911 	 	 r297 	 	 17 	 75S125M
+Chr1 	 	 911 	 	 r454 	 	 17 	 78S122M
+Chr1 	 	 911 	 	 r502 	 	 2 	     94S106M
+Chr1 	 	 911 	 	 r645 	 	 18 	 71S129M
+Chr1 	 	 911 	 	 r700 	 	 38 	 33S167M
+
+Chr2 	 	 421 	 	 r1112 	 	 44 	 3S197M
+Chr2 	 	 421 	 	 r1293 	 	 42 	 43S157M
+Chr2 	 	 421 	 	 r730 	 	 28 	 89S111M
+Chr2 	 	 421 	 	 r738 	 	 36 	 68S132M
+Chr2 	 	 421 	 	 r989 	 	 22 	 140S60M
+Chr2 	 	 421 	 	 r1152 	 	 28 	 100S100M
+Chr2 	 	 421 	 	 r1232 	 	 36 	 75S125M
+
+Chr4 	 	 1 	 	     r2148 	 	 44 	 19S181M
+
+Chr4 	 	 10773 	 	 r1953 	 	 38 	 166M34S
+
+Chr4 	 	 10773 	 	 r1904 	 	 38 	 165M35S
+
+Chr4 	 	 10773 	 	 r2269 	 	 21 	 136M64S
+
+Chr4 	 	 10773 	 	 r1998 	 	 17 	 124M76S
+
+    - This result is interesting because even though there seem to be less "hits" on any given border, the output
+        contains ALL the borders. In the previous experiment, neither output contained all of the borders.
+
+Mapping original onto rearranged: exp8_2
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r706 	 	 44 	 187M13S
+Chr1 	 	 701 	 	 r13 	 	 41 	 134M66S
+Chr1 	 	 701 	 	 r32 	 	 44 	 19S181M
+Chr1 	 	 701 	 	 r296 	 	 42 	 38S162M
+Chr1 	 	 701 	 	 r305 	 	 44 	 23S177M
+Chr1 	 	 701 	 	 r340 	 	 44 	 11S189M
+Chr1 	 	 701 	 	 r522 	 	 36 	 126M74S
+Chr1 	 	 701 	 	 r722 	 	 36 	 124M76S
+Chr1 	 	 701 	 	 r515 	 	 36 	 117M83S
+Chr1 	 	 701 	 	 r470 	 	 28 	 113M87S
+Chr1 	 	 701 	 	 r311 	 	 28 	 87S113M
+Chr1 	 	 701 	 	 r577 	 	 36 	 71S129M
+Chr1 	 	 701 	 	 r587 	 	 24 	 106S94M
+
+Chr2 	 	 421 	 	 r1087 	 	 44 	 26S174M
+Chr2 	 	 421 	 	 r880 	 	 28 	 100S100M
+Chr2 	 	 421 	 	 r1218 	 	 22 	 169S31M
+Chr2 	 	 421 	 	 r1219 	 	 22 	 166S34M
+Chr2 	 	 421 	 	 r1243 	 	 28 	 87S113M
+Chr2 	 	 421 	 	 r1288 	 	 24 	 114S86M
+
+    - This output has roughly the same amount of "hits" on the borders as the previous (exp7_5).
+
+        Next, I will increase the coverage to 20x and keep the read length at 200:
+    Rearranged mapped onto original: exp8_3
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r957 	 	 44 	 194M6S
+Chr1 	 	 701 	 	 r1289 	 	 44 	 179M21S
+Chr1 	 	 701 	 	 r669 	 	 44 	 172M28S
+Chr1 	 	 701 	 	 r62 	 	 38 	 163M37S
+Chr1 	 	 701 	 	 r982 	 	 37 	 156M44S
+Chr1 	 	 701 	 	 r278 	 	 18 	 131M69S
+Chr1 	 	 701 	 	 r135 	 	 17 	 124M76S
+
+Chr1 	 	 911 	 	 r6 	 	 44 	 25S175M
+Chr1 	 	 911 	 	 r572 	 	 44 	 8S192M
+Chr1 	 	 911 	 	 r504 	 	 21 	 59S141M
+Chr1 	 	 911 	 	 r691 	 	 37 	 43S157M
+Chr1 	 	 911 	 	 r799 	 	 9 	     87S113M
+Chr1 	 	 911 	 	 r1028 	 	 9 	     85S115M
+Chr1 	 	 911 	 	 r1118 	 	 21 	 64S136M
+Chr1 	 	 911 	 	 r1407 	 	 37 	 47S153M
+
+Chr2 	 	 421 	 	 r1834 	 	 44 	 6S194M
+Chr2 	 	 421 	 	 r1923 	 	 44 	 21S179M
+Chr2 	 	 421 	 	 r2105 	 	 44 	 20S180M
+Chr2 	 	 421 	 	 r2106 	 	 44 	 30S170M
+Chr2 	 	 421 	 	 r2712 	 	 42 	 49S151M
+Chr2 	 	 421 	 	 r1632 	 	 22 	 137S63M
+Chr2 	 	 421 	 	 r1816 	 	 22 	 128S72M
+Chr2 	 	 421 	 	 r1821 	 	 28 	 100S100M
+Chr2 	 	 421 	 	 r1823 	 	 28 	 92S108M
+Chr2 	 	 421 	 	 r1935 	 	 22 	 120S80M
+Chr2 	 	 421 	 	 r2099 	 	 22 	 134S66M
+Chr2 	 	 421 	 	 r2120 	 	 22 	 124S76M
+Chr2 	 	 421 	 	 r2224 	 	 28 	 88S112M
+Chr2 	 	 421 	 	 r2255 	 	 36 	 68S132M
+Chr2 	 	 421 	 	 r2296 	 	 22 	 133S67M
+Chr2 	 	 421 	 	 r2381 	 	 24 	 106S94M
+Chr2 	 	 421 	 	 r2522 	 	 36 	 68S132M
+Chr2 	 	 421 	 	 r2607 	 	 36 	 80S120M
+
+Chr4 	 	 1 	 	 r3909 	 	 44 	 9S191M
+Chr4 	 	 1 	 	 r4080 	 	 44 	 1S199M
+Chr4 	 	 1 	 	 r4850 	 	 44 	 2S198M
+Chr4 	 	 1 	 	 r3879 	 	 37 	 44S156M
+Chr4 	 	 1 	 	 r4113 	 	 25 	 57S143M
+Chr4 	 	 1 	 	 r4459 	 	 17 	 76S124M
+Chr4 	 	 1 	 	 r4513 	 	 37 	 42S158M
+Chr4 	 	 1 	 	 r4777 	 	 37 	 46S154M
+
+Chr4 	 	 10773 	 	 r4242 	 	 44 	 194M6S
+Chr4 	 	 10773 	 	 r4846 	 	 44 	 170M30S
+Chr4 	 	 10773 	 	 r4735 	 	 39 	 168M32S
+Chr4 	 	 10773 	 	 r4128 	 	 38 	 160M40S
+Chr4 	 	 10773 	 	 r4110 	 	 25 	 148M52S
+Chr4 	 	 10773 	 	 r4292 	 	 17 	 121M79S
+Chr4 	 	 10773 	 	 r4402 	 	 17 	 117M83S
+Chr4 	 	 10773 	 	 r4409 	 	 9 	     111M89S
+Chr4 	 	 10773 	 	 r3924 	 	 28 	 100M100S
+
+Reciprocal (mapping original onto rearranged):
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r112 	 	 44 	 182M18S
+Chr1 	 	 701 	 	 r242 	 	 44 	 168M32S
+Chr1 	 	 701 	 	 r580 	 	 42 	 152M48S
+Chr1 	 	 701 	 	 r896 	 	 41 	 147M53S
+Chr1 	 	 701 	 	 r960 	 	 41 	 147M53S
+Chr1 	 	 701 	 	 r577 	 	 41 	 51S149M
+Chr1 	 	 701 	 	 r640 	 	 44 	 31S169M
+Chr1 	 	 701 	 	 r669 	 	 41 	 57S143M
+Chr1 	 	 701 	 	 r735 	 	 41 	 61S139M
+Chr1 	 	 701 	 	 r1225 	 	 41 	 66S134M
+Chr1 	 	 701 	 	 r1390 	 	 42 	 36S164M
+Chr1 	 	 701 	 	 r1113 	 	 36 	 131M69S
+Chr1 	 	 701 	 	 r888 	 	 28 	 113M87S
+Chr1 	 	 701 	 	 r280 	 	 28 	 103M97S
+Chr1 	 	 701 	 	 r386 	 	 28 	 101M99S
+Chr1 	 	 701 	 	 r1165 	 	 22 	 77M123S
+Chr1 	 	 701 	 	 r232 	 	 22 	 55M145S
+Chr1 	 	 701 	 	 r651 	 	 22 	 53M147S
+Chr1 	 	 701 	 	 r1439 	 	 22 	 53M147S
+Chr1 	 	 701 	 	 r435 	 	 22 	 50M150S
+Chr1 	 	 701 	 	 r982 	 	 22 	 50M150S
+Chr1 	 	 701 	 	 r1418 	 	 22 	 48M152S
+Chr1 	 	 701 	 	 r877 	 	 22 	 47M153S
+Chr1 	 	 701 	 	 r568 	 	 22 	 125S75M
+Chr1 	 	 701 	 	 r588 	 	 22 	 135S65M
+Chr1 	 	 701 	 	 r622 	 	 36 	 84S116M
+Chr1 	 	 701 	 	 r634 	 	 28 	 86S114M
+Chr1 	 	 701 	 	 r705 	 	 22 	 129S71M
+Chr1 	 	 701 	 	 r937 	 	 22 	 126S74M
+Chr1 	 	 701 	 	 r988 	 	 24 	 105S95M
+Chr1 	 	 701 	 	 r1143 	 	 36 	 77S123M
+Chr1 	 	 701 	 	 r1168 	 	 36 	 76S124M
+Chr1 	 	 701 	 	 r1254 	 	 36 	 69S131M
+Chr1 	 	 701 	 	 r1413 	 	 36 	 70S130M
+
+Chr2 	 	 421 	 	 r1509 	 	 44 	 11S189M
+Chr2 	 	 421 	 	 r1553 	 	 44 	 12S188M
+Chr2 	 	 421 	 	 r1589 	 	 44 	 19S181M
+Chr2 	 	 421 	 	 r1803 	 	 42 	 42S158M
+Chr2 	 	 421 	 	 r2276 	 	 44 	 8S192M
+Chr2 	 	 421 	 	 r1580 	 	 24 	 117S83M
+Chr2 	 	 421 	 	 r2113 	 	 24 	 107S93M
+Chr2 	 	 421 	 	 r2536 	 	 28 	 87S113M
+Chr2 	 	 421 	 	 r2554 	 	 28 	 91S109M
+Chr2 	 	 421 	 	 r2729 	 	 24 	 111S89M
+Chr2 	 	 421 	 	 r2743 	 	 24 	 111S89M
+Chr2 	 	 421 	 	 r2777 	 	 36 	 78S122M
+Chr2 	 	 421 	 	 r2876 	 	 22 	 151S49M
+
+Discussion:
+    - Increasing the coverage drastically increased the number of hits on the borders.
+        The border of the duplication is now contained in multiple high confidence reads.
