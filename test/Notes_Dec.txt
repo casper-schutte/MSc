@@ -1,0 +1,294 @@
+
+3/12/21:
+    New idea:
+        For each random starting position in the "make_reads_fa.py" script, make multiple reads of varying length.
+        e.g. 100 bp, and 200 bp. or 100, 150, and 200. Save them in a way such that they can be called and compared
+        after alignment. This might reveal a lot of information about the hard to interpret rearrangements such as
+        duplications.
+
+
+Have the taken the last few days off. Was sick for a bit and needed a mental holiday. I will be working every
+    day until this is done.
+
+7/12/21:
+    - I will be testing the new idea today. Initially, I want to see what the results look like if I simply make
+        two reads for each random starting position, the reads will have different lengths. I will try 100 bp and
+        200 bp. Duplications seem to be the biggest problem, so I will continue using the rearranged genome from
+        the previous few experiments. For future experiments, remember that it is vital to include duplications.
+
+    - Trying to find literature on how duplications are found using bioinformatics tools. One suggestion I came across
+        was to let Bowtie2 report multiple alignments, thus showing multiple positions where reads map very well,
+        which would indicate a potential duplication. I don't think this will work for my purposes, because it will
+        create a lot of noise in the results. Bowtie2 would also return many badly mapping positions.
+        However, given that my script groups breakpoints by position, this might work. Will keep this in mind and try
+        it.
+
+Experiment:
+    - Made reads from "exp7_5.fa" (the rearranged genome I had been using in the last experiments). For each random
+        starting position 2 reads are made, one of length 100 and the other of length 200. The reads are combined into
+        the same read list so coverage is calculated from the combination of both or the read lengths.
+        Made reads from the original multichromosomal test genome (lambda phage) in the same manner.
+
+Rearranged mapped onto original: exp9_1
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r2730 	 	 44 	 196M4S
+Chr1 	 	 701 	 	 r1187 	 	 41 	 74M26S
+Chr1 	 	 701 	 	 r35 	 	 41 	 73M27S
+Chr1 	 	 701 	 	 r1238 	 	 39 	 169M31S
+Chr1 	 	 701 	 	 r1060 	 	 38 	 160M40S
+Chr1 	 	 701 	 	 r96 	 	 37 	 156M44S
+Chr1 	 	 701 	 	 r1874 	 	 25 	 145M55S
+Chr1 	 	 701 	 	 r1068 	 	 21 	 142M58S
+Chr1 	 	 701 	 	 r2296 	 	 9 	     113M87S
+Chr1 	 	 701 	 	 r917 	 	 9 	     54M46S
+
+Chr1 	 	 911 	 	 r563 	 	 44 	 7S93M
+Chr1 	 	 911 	 	 r564 	 	 44 	 7S193M
+Chr1 	 	 911 	 	 r935 	 	 44 	 6S94M
+Chr1 	 	 911 	 	 r936 	 	 44 	 6S194M
+Chr1 	 	 911 	 	 r1929 	 	 44 	 10S90M
+Chr1 	 	 911 	 	 r1930 	 	 44 	 10S190M
+Chr1 	 	 911 	 	 r1945 	 	 44 	 4S96M
+Chr1 	 	 911 	 	 r1946 	 	 44 	 4S196M
+Chr1 	 	 911 	 	 r2213 	 	 44 	 13S87M
+Chr1 	 	 911 	 	 r2214 	 	 44 	 13S187M
+Chr1 	 	 911 	 	 r36 	 	 18 	 73S127M
+Chr1 	 	 911 	 	 r918 	 	 25 	 54S146M
+Chr1 	 	 911 	 	 r1188 	 	 18 	 74S126M
+
+Chr2 	 	 421 	 	 r3281 	 	 41 	 22S78M
+Chr2 	 	 421 	 	 r3282 	 	 44 	 22S178M
+Chr2 	 	 421 	 	 r3598 	 	 41 	 54S146M
+Chr2 	 	 421 	 	 r3914 	 	 44 	 32S168M
+Chr2 	 	 421 	 	 r3982 	 	 41 	 66S134M
+Chr2 	 	 421 	 	 r4037 	 	 44 	 10S90M
+Chr2 	 	 421 	 	 r4038 	 	 44 	 10S190M
+Chr2 	 	 421 	 	 r4101 	 	 41 	 26S74M
+Chr2 	 	 421 	 	 r4102 	 	 44 	 26S174M
+Chr2 	 	 421 	 	 r4144 	 	 42 	 43S157M
+Chr2 	 	 421 	 	 r4156 	 	 41 	 65S135M
+Chr2 	 	 421 	 	 r4160 	 	 42 	 46S154M
+Chr2 	 	 421 	 	 r4162 	 	 41 	 54S146M
+Chr2 	 	 421 	 	 r4186 	 	 41 	 51S149M
+Chr2 	 	 421 	 	 r4488 	 	 41 	 54S146M
+Chr2 	 	 421 	 	 r4718 	 	 41 	 52S148M
+Chr2 	 	 421 	 	 r5142 	 	 42 	 44S156M
+Chr2 	 	 421 	 	 r3379 	 	 22 	 69S31M
+Chr2 	 	 421 	 	 r3380 	 	 36 	 69S131M
+Chr2 	 	 421 	 	 r3490 	 	 28 	 99S101M
+Chr2 	 	 421 	 	 r3554 	 	 22 	 123S77M
+Chr2 	 	 421 	 	 r3597 	 	 22 	 54S46M
+Chr2 	 	 421 	 	 r3742 	 	 22 	 160S40M
+Chr2 	 	 421 	 	 r3814 	 	 22 	 140S60M
+Chr2 	 	 421 	 	 r3913 	 	 36 	 32S68M
+Chr2 	 	 421 	 	 r3981 	 	 22 	 66S34M
+Chr2 	 	 421 	 	 r4143 	 	 28 	 43S57M
+Chr2 	 	 421 	 	 r4155 	 	 22 	 65S35M
+Chr2 	 	 421 	 	 r4159 	 	 24 	 46S54M
+Chr2 	 	 421 	 	 r4161 	 	 22 	 54S46M
+Chr2 	 	 421 	 	 r4185 	 	 22 	 51S49M
+Chr2 	 	 421 	 	 r4428 	 	 22 	 124S76M
+Chr2 	 	 421 	 	 r4487 	 	 22 	 54S46M
+Chr2 	 	 421 	 	 r4626 	 	 22 	 145S55M
+Chr2 	 	 421 	 	 r4672 	 	 22 	 155S45M
+Chr2 	 	 421 	 	 r4717 	 	 22 	 52S48M
+Chr2 	 	 421 	 	 r4814 	 	 22 	 146S54M
+Chr2 	 	 421 	 	 r4888 	 	 28 	 87S113M
+Chr2 	 	 421 	 	 r5104 	 	 22 	 154S46M
+Chr2 	 	 421 	 	 r5141 	 	 24 	 44S56M
+Chr2 	 	 421 	 	 r5213 	 	 22 	 69S31M
+Chr2 	 	 421 	 	 r5214 	 	 36 	 69S131M
+Chr2 	 	 421 	 	 r5280 	 	 28 	 100S100M
+Chr2 	 	 421 	 	 r5550 	 	 28 	 96S104M
+Chr2 	 	 421 	 	 r5664 	 	 24 	 113S87M
+Chr2 	 	 421 	 	 r5768 	 	 22 	 166S34M
+
+Chr4 	 	 1 	 	 r7863 	 	 41 	 24S76M
+Chr4 	 	 1 	 	 r7864 	 	 44 	 24S176M
+Chr4 	 	 1 	 	 r9363 	 	 44 	 12S88M
+Chr4 	 	 1 	 	 r9364 	 	 44 	 12S188M
+Chr4 	 	 1 	 	 r9389 	 	 44 	 14S86M
+Chr4 	 	 1 	 	 r9390 	 	 44 	 14S186M
+Chr4 	 	 1 	 	 r9571 	 	 41 	 27S73M
+Chr4 	 	 1 	 	 r9572 	 	 44 	 27S173M
+Chr4 	 	 1 	 	 r7538 	 	 2 	     98S102M
+Chr4 	 	 1 	 	 r7816 	 	 37 	 41S159M
+Chr4 	 	 1 	 	 r7826 	 	 21 	 65S135M
+Chr4 	 	 1 	 	 r8075 	 	 12 	 40S60M
+Chr4 	 	 1 	 	 r8076 	 	 38 	 40S160M
+Chr4 	 	 1 	 	 r8146 	 	 17 	 76S124M
+Chr4 	 	 1 	 	 r8428 	 	 21 	 61S139M
+Chr4 	 	 1 	 	 r8700 	 	 25 	 51S149M
+Chr4 	 	 1 	 	 r9120 	 	 18 	 73S127M
+Chr4 	 	 1 	 	 r9245 	 	 16 	 38S62M
+Chr4 	 	 1 	 	 r9246 	 	 38 	 38S162M
+Chr4 	 	 1 	 	 r9268 	 	 21 	 60S140M
+
+Chr4 	 	 10773 	 	 r8658 	 	 44 	 185M15S
+Chr4 	 	 10773 	 	 r8142 	 	 44 	 182M18S
+Chr4 	 	 10773 	 	 r8552 	 	 44 	 180M20S
+Chr4 	 	 10773 	 	 r9532 	 	 44 	 180M20S
+Chr4 	 	 10773 	 	 r9458 	 	 44 	 179M21S
+Chr4 	 	 10773 	 	 r8326 	 	 44 	 175M25S
+Chr4 	 	 10773 	 	 r7980 	 	 44 	 172M28S
+Chr4 	 	 10773 	 	 r7537 	 	 44 	 98M2S
+Chr4 	 	 10773 	 	 r8145 	 	 41 	 76M24S
+Chr4 	 	 10773 	 	 r9119 	 	 41 	 73M27S
+Chr4 	 	 10773 	 	 r8574 	 	 39 	 168M32S
+Chr4 	 	 10773 	 	 r9394 	 	 25 	 148M52S
+Chr4 	 	 10773 	 	 r7968 	 	 21 	 141M59S
+Chr4 	 	 10773 	 	 r7676 	 	 21 	 138M62S
+Chr4 	 	 10773 	 	 r9264 	 	 21 	 135M65S
+Chr4 	 	 10773 	 	 r9326 	 	 17 	 120M80S
+Chr4 	 	 10773 	 	 r7858 	 	 17 	 119M81S
+Chr4 	 	 10773 	 	 r9010 	 	 2 	     102M98S
+Chr4 	 	 10773 	 	 r7825 	 	 21 	 65M35S
+Chr4 	 	 10773 	 	 r8427 	 	 16 	 61M39S
+Chr4 	 	 10773 	 	 r9267 	 	 12 	 60M40S
+Chr4 	 	 10773 	 	 r8699 	 	 2 	     51M49S
+Chr4 	 	 10773 	 	 r7815 	 	 22 	 41M59S
+
+    All the borders were identified, although the border at position 1 chromosome 4 should be mapping to the
+    duplicated area.
+
+Original mapped onto rearranged: exp9_2
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r456 	 	 44 	 199M1S
+Chr1 	 	 701 	 	 r1168 	 	 44 	 189M11S
+Chr1 	 	 701 	 	 r272 	 	 44 	 173M27S
+Chr1 	 	 701 	 	 r2790 	 	 41 	 139M61S
+Chr1 	 	 701 	 	 r1581 	 	 41 	 77M23S
+Chr1 	 	 701 	 	 r108 	 	 41 	 54S146M
+Chr1 	 	 701 	 	 r338 	 	 42 	 42S158M
+Chr1 	 	 701 	 	 r740 	 	 42 	 46S154M
+Chr1 	 	 701 	 	 r930 	 	 41 	 67S133M
+Chr1 	 	 701 	 	 r1292 	 	 41 	 52S148M
+Chr1 	 	 701 	 	 r1295 	 	 44 	 4S96M
+Chr1 	 	 701 	 	 r1296 	 	 44 	 4S196M
+Chr1 	 	 701 	 	 r2544 	 	 44 	 31S169M
+Chr1 	 	 701 	 	 r2733 	 	 41 	 23S77M
+Chr1 	 	 701 	 	 r2734 	 	 44 	 23S177M
+Chr1 	 	 701 	 	 r1582 	 	 22 	 77M123S
+Chr1 	 	 701 	 	 r2471 	 	 36 	 68M32S
+Chr1 	 	 701 	 	 r2472 	 	 22 	 68M132S
+Chr1 	 	 701 	 	 r2065 	 	 36 	 66M34S
+Chr1 	 	 701 	 	 r2066 	 	 22 	 66M134S
+Chr1 	 	 701 	 	 r1801 	 	 28 	 61M39S
+Chr1 	 	 701 	 	 r1802 	 	 22 	 61M139S
+Chr1 	 	 701 	 	 r931 	 	 24 	 51M49S
+Chr1 	 	 701 	 	 r932 	 	 22 	 51M149S
+Chr1 	 	 701 	 	 r133 	 	 22 	 48M52S
+Chr1 	 	 701 	 	 r134 	 	 22 	 48M152S
+Chr1 	 	 701 	 	 r515 	 	 22 	 45M55S
+Chr1 	 	 701 	 	 r516 	 	 22 	 45M155S
+Chr1 	 	 701 	 	 r1515 	 	 22 	 31M69S
+Chr1 	 	 701 	 	 r1516 	 	 22 	 31M169S
+Chr1 	 	 701 	 	 r459 	 	 22 	 30M70S
+Chr1 	 	 701 	 	 r107 	 	 22 	 54S46M
+Chr1 	 	 701 	 	 r180 	 	 22 	 130S70M
+Chr1 	 	 701 	 	 r330 	 	 24 	 103S97M
+Chr1 	 	 701 	 	 r337 	 	 28 	 42S58M
+Chr1 	 	 701 	 	 r704 	 	 22 	 144S56M
+Chr1 	 	 701 	 	 r734 	 	 24 	 115S85M
+Chr1 	 	 701 	 	 r739 	 	 24 	 46S54M
+Chr1 	 	 701 	 	 r862 	 	 22 	 162S38M
+Chr1 	 	 701 	 	 r906 	 	 22 	 122S78M
+Chr1 	 	 701 	 	 r929 	 	 22 	 67S33M
+Chr1 	 	 701 	 	 r1176 	 	 24 	 103S97M
+Chr1 	 	 701 	 	 r1291 	 	 22 	 52S48M
+Chr1 	 	 701 	 	 r1560 	 	 28 	 98S102M
+Chr1 	 	 701 	 	 r2410 	 	 22 	 146S54M
+Chr1 	 	 701 	 	 r2543 	 	 36 	 31S69M
+Chr1 	 	 701 	 	 r2914 	 	 24 	 114S86M
+
+Chr2 	 	 421 	 	 r3625 	 	 44 	 4S96M
+Chr2 	 	 421 	 	 r3626 	 	 44 	 4S196M
+Chr2 	 	 421 	 	 r4065 	 	 44 	 9S91M
+Chr2 	 	 421 	 	 r4066 	 	 44 	 9S191M
+Chr2 	 	 421 	 	 r4247 	 	 44 	 8S92M
+Chr2 	 	 421 	 	 r4248 	 	 44 	 8S192M
+Chr2 	 	 421 	 	 r4518 	 	 42 	 36S164M
+Chr2 	 	 421 	 	 r4639 	 	 44 	 2S98M
+Chr2 	 	 421 	 	 r4640 	 	 44 	 2S198M
+Chr2 	 	 421 	 	 r5527 	 	 44 	 4S96M
+Chr2 	 	 421 	 	 r5528 	 	 44 	 4S196M
+Chr2 	 	 421 	 	 r5639 	 	 44 	 4S96M
+Chr2 	 	 421 	 	 r5640 	 	 44 	 4S196M
+Chr2 	 	 421 	 	 r4239 	 	 22 	 69S31M
+Chr2 	 	 421 	 	 r4240 	 	 36 	 69S131M
+Chr2 	 	 421 	 	 r4370 	 	 36 	 82S118M
+Chr2 	 	 421 	 	 r4517 	 	 36 	 36S64M
+Chr2 	 	 421 	 	 r4810 	 	 22 	 154S46M
+Chr2 	 	 421 	 	 r4818 	 	 22 	 133S67M
+Chr2 	 	 421 	 	 r4820 	 	 28 	 90S110M
+Chr2 	 	 421 	 	 r5204 	 	 22 	 139S61M
+Chr2 	 	 421 	 	 r5556 	 	 28 	 92S108M
+Chr2 	 	 421 	 	 r5624 	 	 22 	 119S81M
+
+This experiment yielded more "hits" on the borders compared to the equivalent experiment that used 20x coverage and
+    200bp read length (exp8_4).
+
+The problem in this experiment is that there is still no reliable way to ascertain that the borders at position 1
+(chr 4) are not representative of a real border. The problem is that the border is either assigned to one position or
+the other. Remember, a duplication was made from position 1 to the end of the same chromosome. I need a way to track
+the pairs of reads (one of the pair with length 100bp and the other with length 200, or whatever lengths I end up
+deciding on).
+
+There are 2 ideas I want to try:
+    1) Allow Bowtie2 to return more than one alignment per read. Yes, this will obviously create a lot of "noise" in
+        my data in the form of useless alignments. However, most of this noise will not fall into the positional
+        groups that I construct. As I have observed in my experiments so far, the actual difference in border position
+        reported is close to nothing. We could make the allowance 10bp and get the same results as above. These
+        alternative alignments could support the identification of duplications. I can check if the same read maps
+        well to multiple border areas.
+
+    2) The other idea is one I have discussed previously: Tracking the read pairs and checking if they map to
+        different areas. There is a property of the reads that might allow this; the reads start with r1 which is
+        100bp and r2 follows from the SAME POSITION with length 200bp. So the reads can be paired up such that every
+        even numbered read of 200bp has an odd numbered read of length 100bp preceding it.
+
+I will try to first idea first. I will keep the other parameters the same and simply perform an alignment but return
+the 2 best alignments for each read.
+
+Rearranged mapped onto original: exp9_3
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r2730 	 	 255 	 196M4S
+Chr1 	 	 701 	 	 r1187 	 	 255 	 74M26S
+Chr1 	 	 701 	 	 r1188 	 	 255 	 74M126S
+Chr1 	 	 701 	 	 r35 	 	 255 	 73M27S
+Chr1 	 	 701 	 	 r36 	 	 255 	 73M127S
+Chr1 	 	 701 	 	 r918 	 	 255 	 54M146S
+Chr1 	 	 701 	 	 r1238 	 	 39 	 169M31S
+Chr1 	 	 701 	 	 r1060 	 	 38 	 160M40S
+Chr1 	 	 701 	 	 r96 	 	 37 	 156M44S
+Chr1 	 	 701 	 	 r1874 	 	 25 	 145M55S
+Chr1 	 	 701 	 	 r1068 	 	 21 	 142M58S
+Chr1 	 	 701 	 	 r2296 	 	 9 	 113M87S
+Chr1 	 	 701 	 	 r917 	 	 9 	 54M46S
+
+This is just the borders at pos 701. The MAPQs are hard to interpret. In the reporting mode I set Bowtie2 to (-k),
+    MAPQs work differently in this mode. 255 indicates that this is the best position to map the read to.
+    This method alone does not give me real quality scores I cannot work with these results alone. An interesting
+    observation I made was that it is common for reads to align to BOTH sides of the border.
+    I need to add a function in the script that returns reads that appear more than once in the final output.
+    This output can be used in conjunction with the previous one in order to obtain more information about what is
+    happening at the borders.
+
+
+9/12/21:
+    - Today I will write a function that returns reads that appeared more than once in the output file for the previous
+    experiment. In this way, borders can be connected such that we might be able to deduce where the rearrangement
+    originated.
+    - Investigated writing a bash script to run the command line arguments for the alignments with the tools I use.
+        e.g. Bowtie2 indexing, aligning with local mode, aligning with local mode and k-reporting mode, sorting the
+        alignments with SamTools. Having such a script would increase my efficiency and help me to package the tool
+        once it is done. Read through some guides about bash scripting.
+
+10/12/21:
+    - Will continue writing and testing the function that groups duplicate reads (reads that appear more than once in
+        the SAM file in the k-reporting mode).
+    - Will continue writing the bash script to make my life easier.
+
+    Grouping duplicates:
+        - Instead of reporting all the connected borders and their associated attributes, I can simply report the
+            number of times two borders were reported to be connected.

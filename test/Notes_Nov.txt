@@ -763,3 +763,122 @@ Chr2 	 	 421 	 	 r2876 	 	 22 	 151S49M
 Discussion:
     - Increasing the coverage drastically increased the number of hits on the borders.
         The border of the duplication is now contained in multiple high confidence reads.
+        However, it is not clear from the output what is actually happening there. There cannot be a rearrangement
+        border at only the first position of chromosome 4. The border of the duplication is actually the one at
+        position 10773 on chromosome 4.
+
+Want to test 100 read length with 20x coverage:
+Rearranged mapped onto original: exp8_5.sam
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r705 	 	 44 	 98M2S
+Chr1 	 	 701 	 	 r2615 	 	 44 	 96M4S
+Chr1 	 	 701 	 	 r298 	 	 44 	 92M8S
+Chr1 	 	 701 	 	 r1080 	 	 44 	 89M11S
+Chr1 	 	 701 	 	 r2630 	 	 44 	 89M11S
+Chr1 	 	 701 	 	 r2471 	 	 41 	 77M23S
+Chr1 	 	 701 	 	 r1272 	 	 41 	 74M26S
+Chr1 	 	 701 	 	 r2401 	 	 41 	 74M26S
+Chr1 	 	 701 	 	 r2841 	 	 41 	 73M27S
+Chr1 	 	 701 	 	 r417 	 	 25 	 70M30S
+Chr1 	 	 701 	 	 r467 	 	 16 	 61M39S
+Chr1 	 	 701 	 	 r2562 	 	 2 	     52M48S
+Chr1 	 	 701 	 	 r2641 	 	 2 	     52M48S
+
+Chr1 	 	 911 	 	 r120 	 	 41 	 22S78M
+Chr1 	 	 911 	 	 r1248 	 	 44 	 4S96M
+Chr1 	 	 911 	 	 r1504 	 	 44 	 11S89M
+Chr1 	 	 911 	 	 r1945 	 	 44 	 7S93M
+Chr1 	 	 911 	 	 r2099 	 	 44 	 8S92M
+Chr1 	 	 911 	 	 r112 	 	 21 	 35S65M
+Chr1 	 	 911 	 	 r957 	 	 21 	 34S66M
+Chr1 	 	 911 	 	 r1232 	 	 2 	     47S53M
+Chr1 	 	 911 	 	 r1491 	 	 21 	 33S67M
+Chr1 	 	 911 	 	 r1529 	 	 2 	     48S52M
+Chr1 	 	 911 	 	 r1855 	 	 37 	 28S72M
+Chr1 	 	 911 	 	 r2130 	 	 9 	     43S57M
+Chr1 	 	 911 	 	 r2280 	 	 25 	 30S70M
+Chr1 	 	 911 	 	 r2573 	 	 21 	 33S67M
+
+Chr2 	 	 421 	 	 r3150 	 	 42 	 21S79M
+Chr2 	 	 421 	 	 r3256 	 	 41 	 24S76M
+Chr2 	 	 421 	 	 r3544 	 	 41 	 22S78M
+Chr2 	 	 421 	 	 r4501 	 	 41 	 22S78M
+Chr2 	 	 421 	 	 r3063 	 	 36 	 32S68M
+Chr2 	 	 421 	 	 r3087 	 	 22 	 64S36M
+Chr2 	 	 421 	 	 r3871 	 	 28 	 43S57M
+Chr2 	 	 421 	 	 r3896 	 	 36 	 36S64M
+Chr2 	 	 421 	 	 r4424 	 	 28 	 38S62M
+Chr2 	 	 421 	 	 r4881 	 	 36 	 33S67M
+Chr2 	 	 421 	 	 r4990 	 	 24 	 44S56M
+Chr2 	 	 421 	 	 r5350 	 	 22 	 69S31M
+
+Chr4 	 	 1 	 	 r7686 	 	     42 	 16S84M
+Chr4 	 	 1 	 	 r7692 	 	     42 	 17S83M
+Chr4 	 	 1 	 	 r8952 	 	     44 	 2S98M
+Chr4 	 	 1 	 	 r7873 	 	     9 	     46S54M
+Chr4 	 	 1 	 	 r8581 	 	     9 	     45S55M
+
+Chr4 	 	 10773 	 	 r8275 	 	 44 	 91M9S
+Chr4 	 	 10773 	 	 r7559 	 	 44 	 89M11S
+Chr4 	 	 10773 	 	 r9639 	 	 42 	 85M15S
+Chr4 	 	 10773 	 	 r8640 	 	 42 	 84M16S
+Chr4 	 	 10773 	 	 r7964 	 	 25 	 69M31S
+Chr4 	 	 10773 	 	 r8586 	 	 12 	 60M40S
+Chr4 	 	 10773 	 	 r9135 	 	 9 	     54M46S
+
+
+Original mapped onto rearranged: exp8_6.sam
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r57 	 	 44 	 99M1S
+Chr1 	 	 701 	 	 r204 	 	 44 	 92M8S
+Chr1 	 	 701 	 	 r910 	 	 44 	 86M14S
+Chr1 	 	 701 	 	 r2761 	 	 41 	 74M26S
+Chr1 	 	 701 	 	 r326 	 	 41 	 22S78M
+Chr1 	 	 701 	 	 r938 	 	 42 	 19S81M
+Chr1 	 	 701 	 	 r1767 	 	 44 	 11S89M
+Chr1 	 	 701 	 	 r2279 	 	 44 	 14S86M
+Chr1 	 	 701 	 	 r2481 	 	 36 	 64M36S
+Chr1 	 	 701 	 	 r1050 	 	 24 	 51M49S
+Chr1 	 	 701 	 	 r1458 	 	 22 	 44M56S
+Chr1 	 	 701 	 	 r1698 	 	 22 	 44M56S
+Chr1 	 	 701 	 	 r1932 	 	 22 	 43M57S
+Chr1 	 	 701 	 	 r2518 	 	 22 	 40M60S
+Chr1 	 	 701 	 	 r305 	 	 24 	 49S51M
+Chr1 	 	 701 	 	 r716 	 	 22 	 69S31M
+Chr1 	 	 701 	 	 r1218 	 	 36 	 30S70M
+Chr1 	 	 701 	 	 r1399 	 	 24 	 45S55M
+Chr1 	 	 701 	 	 r1802 	 	 28 	 37S63M
+Chr1 	 	 701 	 	 r1874 	 	 24 	 47S53M
+Chr1 	 	 701 	 	 r2024 	 	 24 	 49S51M
+Chr1 	 	 701 	 	 r2678 	 	 22 	 64S36M
+
+Chr2 	 	 421 	 	 r3541 	 	 44 	 7S93M
+Chr2 	 	 421 	 	 r3649 	 	 44 	 13S87M
+Chr2 	 	 421 	 	 r4245 	 	 44 	 5S95M
+Chr2 	 	 421 	 	 r4477 	 	 42 	 16S84M
+Chr2 	 	 421 	 	 r4684 	 	 41 	 27S73M
+Chr2 	 	 421 	 	 r5234 	 	 44 	 8S92M
+Chr2 	 	 421 	 	 r5662 	 	 44 	 9S91M
+Chr2 	 	 421 	 	 r5789 	 	 44 	 7S93M
+Chr2 	 	 421 	 	 r2948 	 	 22 	 63S37M
+Chr2 	 	 421 	 	 r2953 	 	 28 	 37S63M
+Chr2 	 	 421 	 	 r3824 	 	 22 	 72S28M
+Chr2 	 	 421 	 	 r4376 	 	 22 	 67S33M
+Chr2 	 	 421 	 	 r4713 	 	 22 	 67S33M
+Chr2 	 	 421 	 	 r4810 	 	 22 	 55S45M
+Chr2 	 	 421 	 	 r4952 	 	 22 	 51S49M
+Chr2 	 	 421 	 	 r5074 	 	 24 	 48S52M
+Chr2 	 	 421 	 	 r5237 	 	 36 	 30S70M
+Chr2 	 	 421 	 	 r5356 	 	 36 	 33S67M
+Chr2 	 	 421 	 	 r5373 	 	 22 	 69S31M
+Chr2 	 	 421 	 	 r5468 	 	 22 	 70S30M
+Chr2 	 	 421 	 	 r5829 	 	 24 	 46S54M
+
+
+Discussion:
+recap:
+    - exp8_1 and exp8_2 ~ 200 read length, 10x coverage
+    - exp8_3 and exp8_4 ~ 200 read length, 20x coverage
+    - exp8_5 and exp8_6 ~ 100 read length, 20x coverage
+
+TODO Finish discussion
