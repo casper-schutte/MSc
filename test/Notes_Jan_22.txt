@@ -1,0 +1,75 @@
+Recap:
+    Wrote a bash script to use my time more efficiently.
+    I hypothesised that the ratio of reads that map to different (connected) borders could reveal some information
+    about the rearrangement that took place.
+    I will continue with testing using the example genome (changed only by splitting the single chromosome into 4
+    separate chromosomes) with different rearrangements. I will record what rearrangements are made and save the
+    resulting files in the folder in Desktop: example.
+
+Experiment 10:
+
+    Experiment 10.1:
+        Rearrangements:
+        First 280 bp (4 lines) duplicated from chr1 to end of chr1
+        700 bp deleted from chr2, starting at position 700
+        Translocated the first 210bp from chr3 to the middle of the chromosome
+
+        I will stick to using 2 different read lengths (100 and 200), with a total coverage of 20x
+
+
+13/01/22:
+    - Finished the bash short course on LinkedIn.
+    - Continuing with testing.
+
+    - Upon testing the algorithm with the above parameters, it seems that there is some mistake. The same position on
+        different chromosomes is being reported as the same "hit". This is a problem that needs to be fixed. I thought
+        I had already changed the python script "find_borders_test.py" to avoid this issue. Doing a thorough
+        read-through of the code to catch the mistake.
+        Here is an example from the erroneous result:
+
+Chr1 	 	 1 	 	 r2856 	 	 38 	 33S167M
+Chr1 	 	 1 	 	 r2993 	 	 18 	 36S64M
+Chr1 	 	 1 	 	 r2994 	 	 38 	 36S164M
+Chr3 	 	 1 	 	 r5816 	 	 21 	 61S139M
+Chr3 	 	 1 	 	 r5902 	 	 21 	 64S136M
+Chr3 	 	 1 	 	 r6488 	 	 21 	 60S140M
+Chr3 	 	 1 	 	 r6742 	 	 21 	 58S142M
+Chr3 	 	 1 	 	 r6950 	 	 18 	 73S127M
+
+
+    - Have isolated what I presume to be the error. In the python script, when a hit (such as the hit on position 1 of
+        chromosome 3), does not have any reads that score above the threshold, all the reads that support this hit
+        are placed in the non-confident list ("nonconf_borders"). Thus, when the non-confident reads are being
+        appended to the "correct" list of confident borders (by allowing some distance in position), the reads are
+        appended to the list containing the border at position 1 on CHROMOSOME ONE, instead of CHROMOSOME 3 where they
+        should be.
+        The script needs to check that not only is the position correct, but also the correct chromosome name.
+        If there are "leftover" reads (reads that map to a position that is not supported by confident reads), they
+        should be either appended to the end of the text file under a heading such as: "non-confident borders" or
+        excluded altogether.
+
+    - On the other hand, I think the python script should change such that it takes all 4 sam files (1 single reporting
+        mode, 1 multiple reporting mode, and the 2 reciprocals of these) into account and perhaps tries to match the
+        borders up. The positions will be different but it might be possible to use the connected borders to assign
+        the borders in one genome with the borders of the other.
+
+    - For now, I will be fixing the python script as mentioned in the second paragraph of the first bullet point.
+
+
+15/01/22:
+    - I tracked the problem down. I was missing a check during the process of adding the non-confident borders to the
+        appropriate list. The script now checks for position (within allowance) and chromosome name. The results look
+        good. All the borders were identified. The border position is sometimes off by 1 or 2 base pairs, but this
+        is to be expected due to spurious matching.
+Results (exp10.1):
+
+connected borders:
+[19, ('Chr2', 702, 'Chr2', 1400)]
+
+[24, ('Chr3', 1, 'Chr3', 5462)]
+
+[34, ('Chr1', 1, 'Chr1', 14701)]
+
+[19, ('Chr3', 211, 'Chr3', 5460)]
+
+    The 4 associated SAM files were saved. I will recheck these results, but they appear consistent with expectations.
