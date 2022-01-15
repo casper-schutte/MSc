@@ -268,7 +268,7 @@ Chr1 	 	 701 	 	 r917 	 	 9 	 54M46S
 
 This is just the borders at pos 701. The MAPQs are hard to interpret. In the reporting mode I set Bowtie2 to (-k),
     MAPQs work differently in this mode. 255 indicates that this is the best position to map the read to.
-    This method alone does not give me real quality scores I cannot work with these results alone. An interesting
+    This method alone does not give me real quality scores; I cannot work with these results alone. An interesting
     observation I made was that it is common for reads to align to BOTH sides of the border.
     I need to add a function in the script that returns reads that appear more than once in the final output.
     This output can be used in conjunction with the previous one in order to obtain more information about what is
@@ -292,3 +292,48 @@ This is just the borders at pos 701. The MAPQs are hard to interpret. In the rep
     Grouping duplicates:
         - Instead of reporting all the connected borders and their associated attributes, I can simply report the
             number of times two borders were reported to be connected.
+        Result:
+
+        connected borders:
+        [10, ('Chr1', 701, 'Chr1', 911)]
+
+        [24, ('Chr4', 1, 'Chr4', 10773)]
+
+    The function now checks if there are repeated read names and if there are, it writes the above output to the end
+    of the result/output file. Thus, by making four alignments (1 normal reporting mode, 1 multiple alignment (k)
+    reporting mode, and repeating those 2 for the reciprocal mapping), it is possible to gain information about the
+    positions of the breakpoints and how the breakpoints are connected.
+
+    For the above result, it is clear that the same reads mapped multiple times to position 701 and 911 on chromosome
+    1, which is correct for the rearrangement that was made. The same can be said for the other connected
+    rearrangement, but how to tell that one is from a duplication?
+    I hypothesise that there might be a ratio of number of connected reads (reads that map to more than one border).
+    Given that duplications result in double the number of reads, statistically there should be somewhere around
+    double the amount of reads that connect duplicated areas compared to translocated or deleted areas.
+
+15/12/21:
+    - Took some time off around my birthday, but have continued to look up the basics of bash scripting. I plan on
+        writing a script that:
+        1) Calls python to make the reads (with arguments) from 2 specified genomes
+        2) Calls Bowtie2 to index the genomes
+        3) Calls Bowtie2 to perform 4 different alignments (specified in the above paragraph)
+        4) Sorts the sam files by calling SamTools.
+        5) Calls the python script that finds the borders and writes the output to a .txt file.
+
+    - This will come in handy for 2 reasons: Firstly, I have a lot of testing to do regarding the way borders are
+        found/connected, so it will speed up testing immensely. Secondly, the final "product" should be easy enough to
+        use and a script that can be run from the command line is much easier than 3 separate python scripts (plus
+        Bowtie2 and SamTools).
+
+
+End of December (written 03/01/22):
+    Have written a bash script that performs the actions in the above list (except the first and last items). It does
+    not yet take arguments, I need to add the names of the relevant files to the script. This makes it slower than it
+    should be, but still faster than typing all the relevant commands separately. Now I need to find a way to call
+    the python scripts multiple times with variable filenames and outputs. This might prove tricky, and it might be
+    better to keep the script as is and continue with testing the algorithm.
+
+    The two tasks in the paragraph above (extending the bash script and testing the algorithm) are the most pressing
+    matters. Tomorrow I will continue with testing, using the same example genome (with different rearrangements) and
+    the current form of the bash script. I will need to do the python steps (the first and last on the list above)
+    manually.
