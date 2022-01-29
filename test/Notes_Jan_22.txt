@@ -149,11 +149,26 @@ connected borders: ma_2
     3) The duplication shows up as 2 breakpoints in sa_1 and as a connected border in ma_1. As predicted, it does not
         appear in the other output.
     4) The deletion appeared as 2 breakpoints in sa_1 and as 1 in sa_2. The difference between this and the
-        deletion in the previous experiment is that this one occured in the middle of a chromosome instead of
+        deletion in the previous experiment is that this one occurred in the middle of a chromosome instead of
         at the start or end.
 
     These results are expected and objectively good.
 
-Experiment 10.4:
-    Rearrangements:
 
+29/01/22:
+    - Have been working on the bash script in the past week.
+    - The user can choose the genome and read files from a list of options if they are named correctly:
+        starting with "ref_" for the genomes and "reads_" for the reads.
+    - The script performs all the alignments through Bowtie2 and the sorting with SamTools, for all 4 alignments.
+    - Changed the Python script that makes reads using 2 arguments: the name of the genome file and the name of the
+        output. This script will be called by the bash script twice to construct the reads.
+
+    - Have changed the Python scripts (make_reads_fa.py and find_borders_test.py) to take arguments from the command
+        line using sys.argv, allowing me to call them through the bash script multiple times with different arguments.
+
+    - Something to keep in mind is the reads are not created exactly the same each time, so there will be variation in
+        the results. This is also true for the steps that use Bowtie2, as the alignments it performs are not the same
+        every time. This built-in "randomness" is something I need to consider when verifying the results.
+        20x coverage seems to be enough to reliably catch every breakpoint every time but this remains to be verified.
+
+    - The script now works from a single command line argument. Success!
