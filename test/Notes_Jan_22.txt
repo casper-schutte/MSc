@@ -172,3 +172,182 @@ connected borders: ma_2
         20x coverage seems to be enough to reliably catch every breakpoint every time but this remains to be verified.
 
     - The script now works from a single command line argument. Success!
+
+31/01/22:
+    - Currently, the bash script does the following:
+        1) Provides instructions and asks the user to select the genomes to be compared. It looks for files
+            in the same folder that start with "ref_".
+        2) It calls Bowtie2 to index both of the genome files.
+        3) Calls my Python script that makes reads out of the genome files. This is where some randomness is
+            introduced, as the starting positions of the reads is random, with a set coverage (currently 20x).
+        4) Calls Bowtie2 4 times:
+                - Maps reads from genome 2 onto genome 1 in single report mode (sa_1) and vice versa (sa_2)
+                - Maps reads from genome 2 onto genome 1 in multiple report mode (ma_1) and vice versa (ma_2)
+        5) Calls SamTools to sort the alignment files
+        6) Calls my python script that finds the borders of rearrangement 4 times (once for each sorted SAM file).
+            It outputs 4 text files.
+
+
+    - I will be testing the consistency of the script finding the borders. I use the same rearranged genome to test
+        the algorithm multiple times, but the python files will be changed slightly to show a brief overview of the
+        borders and numbers of reads supporting each border at the top of the file (making it easier to comprehend
+        quickly).
+
+Experiment 10.4:
+    Rearrangements: Same as in 10.3
+    Experiment will be run 10 times and will be used to see how consistent the results are.
+    The python script will be changed to return a brief overview of the borders at the top of the
+    file for easy comparison.
+
+    The repeats will be named like: sa11.txt, sa21.txt, ma11.txt, ma21.txt
+        with the number at the end indicating which repeat the file is from.
+    sa1 and ma1 refer to the mapping of reads from the rearranged genome onto the original one and vice versa
+    It is important to note that the order changed since the last results, as explained in the line above.
+
+    Repeat: ma1 followed by ma2
+1)
+connected borders:
+[19, ('Chr1', 6791, 'Chr1', 7141)]
+[10, ('Chr1', 701, 'Chr1', 6789)]
+[21, ('Chr1', 701, 'Chr1', 7142)]
+
+connected borders:
+[29, ('Chr3', 1, 'Chr3', 281)]
+[23, ('Chr1', 699, 'Chr1', 7141)]
+[19, ('Chr2', 5741, 'Chr2', 6511)]
+[16, ('Chr1', 701, 'Chr1', 1051)]
+[20, ('Chr1', 1052, 'Chr1', 7141)]
+
+2)
+connected borders:
+[19, ('Chr1', 701, 'Chr1', 7142)]
+[9, ('Chr1', 701, 'Chr1', 6789)]
+[18, ('Chr1', 6791, 'Chr1', 7141)]
+
+connected borders:
+[21, ('Chr1', 701, 'Chr1', 1051)]
+[13, ('Chr1', 1052, 'Chr1', 7141)]
+[12, ('Chr3', 1, 'Chr3', 281)]
+[13, ('Chr1', 699, 'Chr1', 7141)]
+[24, ('Chr2', 5741, 'Chr2', 6511)]
+
+3)
+connected borders:
+[17, ('Chr1', 701, 'Chr1', 7142)]
+[17, ('Chr1', 6791, 'Chr1', 7141)]
+[16, ('Chr1', 701, 'Chr1', 6789)]
+
+connected borders:
+[23, ('Chr2', 5741, 'Chr2', 6511)]
+[16, ('Chr3', 1, 'Chr3', 281)]
+[17, ('Chr1', 699, 'Chr1', 7141)]
+[21, ('Chr1', 701, 'Chr1', 1051)]
+[13, ('Chr1', 1052, 'Chr1', 7141)]
+
+4)
+connected borders:
+[14, ('Chr1', 701, 'Chr1', 7142)]
+[16, ('Chr1', 701, 'Chr1', 6789)]
+[14, ('Chr1', 6791, 'Chr1', 7141)]
+
+connected borders:
+[11, ('Chr2', 5741, 'Chr2', 6511)]
+[19, ('Chr1', 1052, 'Chr1', 7141)]
+[16, ('Chr1', 699, 'Chr1', 7141)]
+[26, ('Chr3', 1, 'Chr3', 281)]
+[16, ('Chr1', 701, 'Chr1', 1051)]
+
+5)
+connected borders:
+[6, ('Chr1', 6791, 'Chr1', 7141)]
+[14, ('Chr1', 701, 'Chr1', 7142)]
+[21, ('Chr1', 701, 'Chr1', 6789)]
+
+connected borders:
+[17, ('Chr1', 699, 'Chr1', 7141)]
+[32, ('Chr1', 701, 'Chr1', 1051)]
+[15, ('Chr3', 1, 'Chr3', 281)]
+[17, ('Chr2', 5741, 'Chr2', 6511)]
+[22, ('Chr1', 1052, 'Chr1', 7141)]
+
+6)
+connected borders:
+[28, ('Chr1', 6791, 'Chr1', 7141)]
+[21, ('Chr1', 701, 'Chr1', 7142)]
+[19, ('Chr1', 701, 'Chr1', 6789)]
+
+connected borders:
+[18, ('Chr1', 1052, 'Chr1', 7141)]
+[21, ('Chr1', 701, 'Chr1', 1051)]
+[24, ('Chr3', 1, 'Chr3', 281)]
+[20, ('Chr2', 5741, 'Chr2', 6511)]
+[20, ('Chr1', 699, 'Chr1', 7141)]
+
+7)
+connected borders:
+[18, ('Chr1', 701, 'Chr1', 6789)]
+[18, ('Chr1', 6791, 'Chr1', 7141)]
+[19, ('Chr1', 701, 'Chr1', 7142)]
+
+connected borders:
+[19, ('Chr3', 1, 'Chr3', 281)]
+[9, ('Chr1', 1052, 'Chr1', 7141)]
+[22, ('Chr2', 5741, 'Chr2', 6511)]
+[18, ('Chr1', 699, 'Chr1', 7141)]
+[13, ('Chr1', 701, 'Chr1', 1051)]
+
+8)
+connected borders:
+[17, ('Chr1', 701, 'Chr1', 6789)]
+[13, ('Chr1', 701, 'Chr1', 7142)]
+[16, ('Chr1', 6791, 'Chr1', 7141)]
+
+connected borders:
+[24, ('Chr3', 1, 'Chr3', 281)]
+[11, ('Chr1', 699, 'Chr1', 7141)]
+[11, ('Chr2', 5741, 'Chr2', 6511)]
+[18, ('Chr1', 1052, 'Chr1', 7141)]
+[7, ('Chr1', 701, 'Chr1', 1051)]
+
+9)
+connected borders:
+[13, ('Chr1', 701, 'Chr1', 7142)]
+[20, ('Chr1', 6791, 'Chr1', 7141)]
+[12, ('Chr1', 701, 'Chr1', 6789)]
+
+connected borders:
+[16, ('Chr3', 1, 'Chr3', 281)]
+[14, ('Chr1', 699, 'Chr1', 7141)]
+[13, ('Chr1', 701, 'Chr1', 1051)]
+[19, ('Chr1', 1052, 'Chr1', 7141)]
+[15, ('Chr2', 5741, 'Chr2', 6511)]
+
+10)
+connected borders:
+[15, ('Chr1', 701, 'Chr1', 7142)]
+[31, ('Chr1', 701, 'Chr1', 6789)]
+[24, ('Chr1', 6791, 'Chr1', 7141)]
+
+connected borders:
+[29, ('Chr3', 1, 'Chr3', 281)]
+[22, ('Chr1', 699, 'Chr1', 7141)]
+[11, ('Chr1', 1052, 'Chr1', 7141)]
+[17, ('Chr1', 701, 'Chr1', 1051)]
+[15, ('Chr2', 5741, 'Chr2', 6511)]
+
+All frequencies: 19,10,21,29,23,19,16,20,19,9,18,21,13,12,13,24,17,17,16,23,16,17,21,13,14,16,14,11,19,16,26,16,6,14,
+21,17,32,15,17,22,28,21,19,18,21,24,20,20,18,18,19,19,9,22,18,13,17,13,16,24,11,11,18,7,13,20,12,16,14,13,19,15,15,31,
+24,29,22,11,17,15
+
+Discussion:
+    It is difficult to draw any conclusions from simply looking at this data, other than the fact that
+    all connected breakpoints were discovered.
+    The average occurrence of any connected breakpoint was 17.65. This is quite close to the coverage of
+    the reads (20x).
+    The highest count recorded in these 10 repeats was 32 and the lowest was 6.
+    Six reads all confirming the same connected breakpoint is still enough to say that the breakpoints are connected,
+        but how to calculate the chances of the algorithm missing a breakpoint?
+    The standard deviation was calculated to be 5.22. I need to know more about statistics to know if this is good.
+
+End of January notes. See "Notes_Feb_2022" for the continuation of these notes.
+
