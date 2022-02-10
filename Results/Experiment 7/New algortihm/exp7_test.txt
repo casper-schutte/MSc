@@ -1,0 +1,16 @@
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string 
+Chr2 	 	 5532 	 	 r1516 	 	 44 	 92M8S 
+Chr2 	 	 5532 	 	 r2691 	 	 41 	 74M26S 
+Chr2 	 	 5532 	 	 r2098 	 	 16 	 62M38S 
+Chr2 	 	 5532 	 	 r2083 	 	 2 	 52M48S 
+Chr2 	 	 5532 	 	 r2363 	 	 2 	 52M48S 
+
+Chr2 	 	 6307 	 	 r1877 	 	 44 	 6S94M 
+Chr2 	 	 6312 	 	 r2018 	 	 44 	 11S89M 
+Chr2 	 	 6315 	 	 r2602 	 	 44 	 14S86M 
+Chr2 	 	 6333 	 	 r1668 	 	 21 	 32S68M 
+Chr2 	 	 6341 	 	 r1984 	 	 12 	 40S60M 
+Chr2 	 	 6319 	 	 r2009 	 	 42 	 18S82M 
+Chr2 	 	 6327 	 	 r2578 	 	 41 	 26S74M 
+Chr2 	 	 6345 	 	 r2745 	 	 9 	 44S56M 
+

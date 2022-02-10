@@ -1,0 +1,178 @@
+
+Experiment to test the adapted algorithm on the normal rearrangements.
+Will first be tested on uni-chromosomal test data, followed by multi-chromosomal test data in Experiment 6
+Finally, if the results are good and no more changes are necessary, the algorithm will be tested on real data in a
+future experiment.
+
+Experiment 5.1:
+    Will map genomes with rearrangements onto the unchanged lambda virus genome
+    - Translocation: exp5_1.sam, exp5_2.sam, exp5_3.sam
+        Middle to middle:
+            Visually the alignment worked, can the algorithm return the correct borders?
+            RESULT: The script "consecutive_block_test.py" ALONE was able to detect each border. In this case using the
+                quality score was not even necessary, but will definitely be helpful to investigate edge cases and even
+                to apply some statistical treatment.
+
+                [(position, read_number, MAPQ),(position, read_number, MAPQ)] - continuous block
+                [(1, 'r1', '44'), (4401, 'r45', '44')]
+                [(6231, 'r46', '21'), (29833, 'r284', '44')]
+                [(4551, 'r285', '42'), (6123, 'r301', '25')]
+                [(29961, 'r302', '44'), (48353, 'r486', '44')]
+
+        Middle to end:
+            Worked again. The consecutive blocks are clearly identified.
+
+        Middle to front:
+            Worked again.
+
+
+Experiment 5.2:
+
+    - Deletion and Insertion:
+        Deletion from middle:
+        - 2 deletions were made.
+            Result: Borders were easily identifiable
+
+                [(position, read_number, MAPQ),(position, read_number, MAPQ)] - continuous block
+                [(1, 'r1', '44'), (21601, 'r217', '21')]
+                [(23580, 'r218', '44'), (35763, 'r342', '44')]
+                [(37101, 'r343', '21'), (48353, 'r456', '44')]
+
+                The fact that there seem to be borders between consecutive (by read number) reads indicates deletion.
+
+        Insertion into middle:
+        - Testing the exact same files but mapping reciprocally.
+            Result: Worked better than expected. Not only are the borders clearly visible, but it is also
+                evident which borders belong to the insertion. They are returned as a consecutive block
+                that starts at position 0 and ends at position 0. This is good.
+
+                [(1, 'r1', '44'), (21601, 'r217', '36')]
+                [(0, 'r218', '0'), (0, 'r235', '0')]
+                [(21701, 'r236', '24'), (33974, 'r361', '22')]
+                [(0, 'r362', '0'), (0, 'r372', '0')]
+                [(34032, 'r373', '36'), (45284, 'r486', '44')]
+
+        Deletion from start AND end:
+            Result: Only 1 continous block is returned, but it is evident from the positions that the end and
+            the middle have both been deleted.
+
+            [(2101, 'r1', '44'), (46497, 'r446', '44')]
+
+
+        Insertion at start AND end:
+            (reciprocal mapping of the same files)
+            Result: 3 blocks are returned, clearly showing where the reads do not map (the inserted sequences).
+
+            [(0, 'r1', '0'), (0, 'r20', '0')]
+            [(1, 'r21', '22'), (44453, 'r468', '36')]
+            [(0, 'r469', '0'), (0, 'r486', '0')]
+
+            Using the outputs for both mappings gives one all the information to say that 2 INDELs occured.
+
+
+Experiment 5.3:
+
+    - Reversal/inversion:
+        In middle:
+            Result: The borders are returned with no problems. However, there is no difference in the way the borders
+                are returned compared to insertion, because to the mapping algorithm there is no difference. All that
+                is detectable is that some reads did not map anywhere. This might need to change.
+
+                [(1, 'r1', '44'), (12001, 'r121', '22')]
+                [(0, 'r122', '0'), (0, 'r146', '0')]
+                [(14701, 'r147', '22'), (48353, 'r486', '44')]
+
+                This result is indistinguishable from the results with INDELs.
+
+        Reciprocal map (middle):
+            Result: The EXACT same borders are returned. I am tempted to say that I can identify inversion (reversal
+                of a sequence) by reciprocally mapping and seeing which borders are shared (exactly) between the two
+                genomes. However, Bowtie2 uses random seeds when choosing where to start making alignments, so this
+                must be kept in mind for larger genomes with many rearrangements. Although this algorithm is intended
+                for use on very closely related species.
+
+                [(1, 'r1', '44'), (12001, 'r121', '22')]
+                [(0, 'r122', '0'), (0, 'r146', '0')]
+                [(14701, 'r147', '22'), (48353, 'r486', '44')]
+
+                The results are literally EXACTLY the same. This indicates that the same sequence was inverted with
+                respect to the other genome.
+
+        End of sequence:
+            Result: Exactly the same as previous
+
+            [(1, 'r1', '44'), (44553, 'r448', '41')]
+            [(0, 'r449', '0'), (0, 'r486', '0')]
+
+            Tested reciprocally:
+
+            [(1, 'r1', '44'), (44553, 'r448', '41')]
+            [(0, 'r449', '0'), (0, 'r486', '0')]
+
+Experiment 5.4:
+    - Duplication:
+        Middle-to-middle: duplicated mapped to original
+            Result: Borders clearly visible. By the position field, one can tell that a duplication took place because
+                the position of the first continuous block goes beyond that on the next one (the duplication) eg:
+
+                [(position, read_number, MAPQ),(position, read_number, MAPQ)]
+                [(1, 'r1', '44'), (28143, 'r283', '44')]
+                [(11411, 'r284', '37'), (13173, 'r302', '44')]
+                [(28281, 'r303', '38'), (48353, 'r504', '44')]
+
+        Reciprocal map: original mapped to duplicated
+            Result: The result is "bad" in that information cannot really be extracted from it. The reads that were
+                duplicated are mapped to all kinds of different positions eg:
+                [(1, 'r1', '44'), (11401, 'r115', '11')]
+
+                [(28371, 'r116', '1'), (28571, 'r118', '1')]
+                [(11801, 'r119', '1'), (11801, 'r119', '1')]
+                [(28771, 'r120', '1'), (29171, 'r124', '1')]
+                [(12401, 'r125', '1'), (12501, 'r126', '1')]
+                [(29471, 'r127', '1'), (29571, 'r128', '1')]
+                [(12801, 'r129', '1'), (28153, 'r284', '44')]
+
+                [(30171, 'r285', '42'), (50243, 'r486', '44')]
+
+                The middle blocks mapped to seemingly random positions with MAPQ of 1 (very low). There are 2 things
+                I can do to fix this problem. Firstly: I could add something in my script that checks for continuous
+                blocks in MAPQ and returns them like a normal block or omit them altogether. On the other hand, I could
+                leave it as is because upon mapping reads that were NOT duplicated to a genome that has the duplication
+                it would become clear as in the previous experiment.
+
+        Start-to-end duplication: duplicated mapped to original
+            Result: As with the first duplication experiment, the borders are clearly identified and one can even
+                tell a duplication took place since the second block's positions show positions that are already within
+                another continuous block:
+
+                [(1, 'r1', '44'), (48413, 'r487', '17')]
+                [(11, 'r488', '44'), (1811, 'r506', '44')]
+                 With the reintroduction of multiple chromosomes, this should still be clear as the chromosome name
+                 will be returned as well.
+
+        Reciprocal (original mapped to duplicate):
+            Result: Again, the blocks returned are a complete mess, at least over the duplicated part:
+
+                [(1, 'r1', '1'), (1, 'r1', '1')]
+                [(48603, 'r2', '1'), (48603, 'r2', '1')]
+                [(201, 'r3', '1'), (301, 'r4', '1')]
+                [(48903, 'r5', '1'), (48903, 'r5', '1')]
+                [(501, 'r6', '1'), (701, 'r8', '1')]
+                [(49303, 'r9', '1'), (49903, 'r15', '1')]
+                [(1501, 'r16', '1'), (1501, 'r16', '1')]
+                [(50103, 'r17', '1'), (50303, 'r19', '1')]
+
+                [(1901, 'r20', '38'), (48353, 'r486', '44')]
+
+                The duplication was added to the end of the file (from the start) but the alignment gives the
+                duplicated reads full MAPQ score and the original sequence all 1 (very low). Same problem as above.
+                Perhaps areas like this are to be handled like insertions or omitted? The rearrangement is obvious
+                when performed from the other direction, but what if BOTH genomes contain a duplication RELATIVE to one
+                another? This is far from impossible, in fact it might be likely. Think about this.
+
+
+This concludes Experiment 5. The results are satisfactory for uni-chromosomal genomes. There seems to be a way to
+    "identify" or at least "make an educated guess" as to the type of rearrangement that occured. This was not in
+    the scope of the original project, but being able to do this would be incredibly useful. I suspect with more
+    complex genomes (more chromosomes, more rearrangements, overlapping rearrangements) this may not be so simple
+    anymore.

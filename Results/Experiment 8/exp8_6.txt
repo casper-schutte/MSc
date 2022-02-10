@@ -1,0 +1,46 @@
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string 
+Chr1 	 	 701 	 	 r57 	 	 44 	 99M1S 
+Chr1 	 	 701 	 	 r204 	 	 44 	 92M8S 
+Chr1 	 	 701 	 	 r910 	 	 44 	 86M14S 
+Chr1 	 	 701 	 	 r2761 	 	 41 	 74M26S 
+Chr1 	 	 701 	 	 r326 	 	 41 	 22S78M 
+Chr1 	 	 701 	 	 r938 	 	 42 	 19S81M 
+Chr1 	 	 701 	 	 r1767 	 	 44 	 11S89M 
+Chr1 	 	 701 	 	 r2279 	 	 44 	 14S86M 
+Chr1 	 	 701 	 	 r2481 	 	 36 	 64M36S 
+Chr1 	 	 701 	 	 r1050 	 	 24 	 51M49S 
+Chr1 	 	 701 	 	 r1458 	 	 22 	 44M56S 
+Chr1 	 	 701 	 	 r1698 	 	 22 	 44M56S 
+Chr1 	 	 701 	 	 r1932 	 	 22 	 43M57S 
+Chr1 	 	 701 	 	 r2518 	 	 22 	 40M60S 
+Chr1 	 	 701 	 	 r305 	 	 24 	 49S51M 
+Chr1 	 	 701 	 	 r716 	 	 22 	 69S31M 
+Chr1 	 	 701 	 	 r1218 	 	 36 	 30S70M 
+Chr1 	 	 701 	 	 r1399 	 	 24 	 45S55M 
+Chr1 	 	 701 	 	 r1802 	 	 28 	 37S63M 
+Chr1 	 	 701 	 	 r1874 	 	 24 	 47S53M 
+Chr1 	 	 701 	 	 r2024 	 	 24 	 49S51M 
+Chr1 	 	 701 	 	 r2678 	 	 22 	 64S36M 
+
+Chr2 	 	 421 	 	 r3541 	 	 44 	 7S93M 
+Chr2 	 	 421 	 	 r3649 	 	 44 	 13S87M 
+Chr2 	 	 421 	 	 r4245 	 	 44 	 5S95M 
+Chr2 	 	 421 	 	 r4477 	 	 42 	 16S84M 
+Chr2 	 	 421 	 	 r4684 	 	 41 	 27S73M 
+Chr2 	 	 421 	 	 r5234 	 	 44 	 8S92M 
+Chr2 	 	 421 	 	 r5662 	 	 44 	 9S91M 
+Chr2 	 	 421 	 	 r5789 	 	 44 	 7S93M 
+Chr2 	 	 421 	 	 r2948 	 	 22 	 63S37M 
+Chr2 	 	 421 	 	 r2953 	 	 28 	 37S63M 
+Chr2 	 	 421 	 	 r3824 	 	 22 	 72S28M 
+Chr2 	 	 421 	 	 r4376 	 	 22 	 67S33M 
+Chr2 	 	 421 	 	 r4713 	 	 22 	 67S33M 
+Chr2 	 	 421 	 	 r4810 	 	 22 	 55S45M 
+Chr2 	 	 421 	 	 r4952 	 	 22 	 51S49M 
+Chr2 	 	 421 	 	 r5074 	 	 24 	 48S52M 
+Chr2 	 	 421 	 	 r5237 	 	 36 	 30S70M 
+Chr2 	 	 421 	 	 r5356 	 	 36 	 33S67M 
+Chr2 	 	 421 	 	 r5373 	 	 22 	 69S31M 
+Chr2 	 	 421 	 	 r5468 	 	 22 	 70S30M 
+Chr2 	 	 421 	 	 r5829 	 	 24 	 46S54M 
+

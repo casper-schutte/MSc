@@ -1,0 +1,42 @@
+#!/bin/env bash
+echo 'hello'
+function index_genomes(){
+for i in $(ls ref_*.fa)
+	do bowtie2-build ${i} ${i}
+done
+}
+
+index_genomes
+
+# read -p "Reference genome 1: " genome1
+# read -p "Reference genome 2: " genome2
+genome1="ref_lv_mc.fa"
+genome2="ref_exp10_1.fa"
+# reads1="reads_${genome1}"
+# reads2="reads_${genome2}"
+reads1="reads_lv_mc.fa"
+reads2="reads_exp10_1.fa"
+
+single_report_align(){
+	bowtie2 --local -f -x $1 -U $2 -S $3.sam
+}
+
+single_report_align ${genome1} ${reads2} sa_1
+single_report_align ${genome2} ${reads1} sa_2
+
+multiple_report_align(){
+	bowtie2 --local -f -k 2 -x $1 -U $2 -S $3.sam
+}
+
+multiple_report_align ${genome1} ${reads2} ma_1
+multiple_report_align ${genome2} ${reads1} ma_2
+
+sort_sams(){
+	samtools sort $1 -O sam > ${1#.sam}.sorted.sam
+
+}
+
+sort_sams sa_1.sam
+sort_sams sa_2.sam
+sort_sams ma_1.sam
+sort_sams ma_2.sam

@@ -1,0 +1,31 @@
+07/07/21:
+    - Update experiment flow diagram
+    - Make a very general/reusable script to make reads:
+        - Variable length
+        - Variable overlap
+        - Variable to keep track of original position
+        - Variable to associate a read with quality score
+        - Way to write to a file (format?)
+
+
+
+17/07/21:
+    - Making script that makes reads as above
+    - Checking if they are correct (visually)
+    - Will Bowtie2 take this input?
+    - Add randomized quality scores, does it map back to the genome as it should?
+    - make rearrangement, how does it map now?
+
+19/07/21:
+    - The script creates a fastQ file with a randomized quality score
+    - Bowtie2 accepts the file to map to a genome
+    - Now introduce large rearrangement/s and observe what Bowtie2 does
+    - It should successfully map the unchanged sections, and SAMtools pileup will be
+        used to investigate the parts that aren't mapping where they "should."
+
+
+23/07/21:
+    - Will make a new flow diagram to describe my idea (and room for improvements)
+    - Investigate SAMtools and BCFtools for commands that my idea easier.
+    - Test extracting CIGAR strings and the read positions where the CIGAR string
+        indicates that a read did not map properly.

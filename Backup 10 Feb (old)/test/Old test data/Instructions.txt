@@ -1,0 +1,44 @@
+To identify the borders between 2 closely related genomes, the following is necessary: 
+(Assuming you have 2 closely related genomes)
+First, reads need to be constructed from the full genome sequence using the python script
+
+"make_reads_fastq_test.py"
+
+This script takes a fastA file and randomizes quality scores for reads. 
+The reads are written to a fastQ file. The script will take quality 
+scores from the bases when real data is used. In the script, the name of the file containing 
+the genome must be specified, as well as the name of the fastQ file to create.
+
+In the command line, create an index from the OTHER genome (not the one from which reads 
+were constructed). Bowtie2 is required
+
+"~/Desktop/example$ bowtie2-build file_path_of_genome/genomeA.fa example_index_name"
+
+Now, the reads can be mapped to the indexed genome:
+
+~/Desktop/example$ bowtie2 --local -x example_index_name -U path_to_read/example_reads.fq -S example_output_name.sam
+
+The "--local" setting seems to return better results. For large genomes, one might first 
+perfrom a less computationally intensive alignment in order to save time and memory. 
+This remains to be investigated when the algoritm is scaled up. 
+
+This creates a SAM file containing information about how well the reads mapped to the 
+specified reference genome. In the python script "main_copy.py" (name will change) one can 
+specify the name of the SAM file in the "filepath" variable. The python script contains two 
+main functions that return data of interest. The first function returns all the reads in 
+the SAM file with a mapping quality (MAPQ) below a certain threshold. This can be changed 
+but the current script returns any reads that have a lower MAPQ than the maximum within 
+the SAM file. It returns read name, mapping quality, and position (in genome).
+The second function returns reads in "blocks" that remained in order. Reads are grouped 
+by whether they are in consecutive order or not. 
+
+Currently this script prints out reads that mapped badly and then blocks of read that 
+mapped consecutively. These two outputs agree very well on where the borders are, but 
+further testing is required. Especially with regards to optimizing parameters in the 
+different steps. Another step is needed to further "zoom in" on the breakpoint to a 
+base-pair level. 
+
+NB: in the zipped folder there are two fastA files, "lambda_virus.fa" and "lambda_virus_exp3.fa" 
+One large transposition took place in the latter. Can you find it?
+Ignore files not named is this document, and remember to change the variable names that relate 
+to files and paths as necessary.

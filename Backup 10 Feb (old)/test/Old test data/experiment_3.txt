@@ -1,0 +1,53 @@
+Experiment 3:
+	Aim: Test calling reads that do not map well due to rearrangements in the genome
+	
+	Will be using the lambda phage genome included with Bowtie2 and introduce rearrangements.
+	Bowtie2 will be used to map generated reads from the unchanged genome onto the one 
+	with rearrangements, and vice versa.
+
+	Changes made to the genome:
+	
+	
+
+    	420bp (lines 600 - 605 in .fa file) moved to 500 - 505
+    	    positions = (("line number" - 1) x 70)
+    	    =
+
+    	deleted 210 bp (lines 360 - 362)
+
+    	350bp moved from (200 - 204) to (150 - 154)
+    	position =
+
+    	In fastA file called "lambda_virus_re3.fa"
+    	
+    	Make reads from this genome written to file as "experiment_re3.fq"
+    	with randomized quality scores. Map these reads to the unchanged genome
+    	"lambda_virus.fa" using Bowtie2.
+    	Index the unchanged genome:
+    	$Bowtie2-build reference/lambda_virus.fa lambda_virus
+    	
+    	Map rearranged reads onto the reference:
+    	$Bowtie2 -x lambda_virus -U reads/experiment_re3.fq -S exp_3_re.sam
+    	
+    	Then do the reverse where reads from the unchanged genome are mapped onto the 
+    	rearranged one:
+    	$bowtie2-build reference/lambda_virus_re3.fa lambda_virus_re3
+    	
+    	$bowtie2 -x lambda_virus_re3 -U reads/lambda_virus_reads.fq -S exp_3.sam
+
+
+    	Running python script to return reads with lower mapping quality than the maximum
+    	(this threshold will likely change)
+
+    	Results:
+        Need to work out if the positions returned correlate with the rearrangements. They seem to.
+        Need to change the script to take into account changes in position because reads that
+        are completely contained in a rearrangement have the same high mapping quality as
+        non-rearranged reads.
+        Is the information returned by my script enough to do a local alignment. How should
+        I go about it?
+
+
+        Experiment 3 needs to be repeated with a genome that had 1 large rearrangement, to
+        fine tune some parameters. Such as taking into account the position the read was mapped
+        to.

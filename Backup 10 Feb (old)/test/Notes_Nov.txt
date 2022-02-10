@@ -1,0 +1,884 @@
+
+01/11/21:
+    - Have 2 weeks to finish all the coding so that I have 6 weeks to write up.
+
+    - To do:
+        1) Fix the code, it cannot handle the positions resetting for different chromosomes.
+
+        2) Test the algorithm/tool on real data
+
+        Sounds easy, but I have not been able to do either.
+
+    - I can't start testing on real data because the algorithm might change. So the priority is fixing the code.
+        The problem is that when the consecutive blocks are calculated, they are not associated with the read
+        name or number. In the previous iteration of the script, position (relative to the reference) was unique.
+        Now, with the introduction of multiple chromosomes, the positions are no longer unique. Thus, I need to change
+        the way the consecutive blocks are located or find a way to keep additional data such that the blocks are still
+        identifiable.
+
+    - One way I can overcome the problem is by using a different algorithm to return nonconsecutive blocks. I like the
+        algorithm. The other way is to try to keep track of the read name while using the same algorithm. I will try
+        the latter first.
+
+02/11/21:
+    - Made a lot of progress today. The script "consecutive_block_test.py" is working well using the new method.
+        There are one or two kinks that might have to be worked out, but I will integrate it into my code and test
+        different rearrangements. Then I will test using real data.
+    - One thing I need to do is figure out how to extract the "AS" field as this will likely help me to assign borders
+        more than just using the mapping quality (MAPQ). Since for FastA files there are reads that were clipped
+        but still had a perfect mapping score (uniqueness).
+
+03/11/21:
+    - Will conduct some tests today to verify how the adapted algorithm works with different kinds of rearrangements.
+        The results will be written up in "experiment_5.txt."
+    - First round of tests were successful. Will continue tomorrow.
+
+04/11/21:
+    - Will continue with the tests of the new script. As soon as that is done I can start testing real data.
+
+05/11/21:
+    - Continued with testing the script on artificial rearrangements. See "experiment_5.txt"
+
+06/11/21:
+    - Should be finishing experiments on artificial data. Might make changes on what and how things are returned.
+
+07/11/21:
+    - Needed to make small changes. Results very good so far (see experiment_5.txt)
+    - Testing multichromosoma data, see experiment_6.txt
+
+08/11/21:
+    - Finished experiment 6, see experiment_6.txt for results.
+    - Ecerything is working as it should.
+
+09/11/21:
+    - Need to incorporate the new algorithm with the full script, so that we can also look at reads that did
+        not map properly. These reads should correlate with the borders of rearrangements.
+
+10/11/21:
+    - Trying to fix the way that the algorithm deals with duplications. One of the duplicated pair of reads "maps" to
+        the right place but the other either does not or does map but in both cases the MAPQ is 1. I would like to
+        combine these reads with terrible quality scores into a single block (if they are continuous). This would
+        make the output much more clear.
+    - Decided it would be better if the borders and blocks were written to a .txt file instead of only being printed
+        in the terminal.
+
+13/11/21:
+    - Will be trying to change the way reads are generated
+    - Changing the way Bowtie2 returns reads such that coverage is increased. Multiple reads will be constructed from
+        the same start position but of different lengths.
+    - Did not find a way to do this in Bowtie2, but Samtools can do it:
+
+    $ Samtools view -q (MAPQ below which reads are not returned) file_name.sam  > file_name.filtered.sam
+
+    - After filtering out the reads with very low MAPQ (1 or 0, which were the ones that did not map or were
+        duplicated), the real data proved too "noisy." My algorithm was too sensitive. Mapping single, slightly
+        overlapping reads to construct continuous blocks worked very well for the artificial data. However, the real
+        data proved much too noisy. Small differences in the genomes (and in the way reads happen to be mapped -
+        remember that Bowtie2 uses random seeds to start looking for alignments).
+
+    - I need to change the way reads are constructed. Multiple reads (of varying lengths) will be constructed from the
+        same starting position. This way, the reads will all map where the genomes are the same. Where there is a
+        breakpoint, the shorter reads should map but the longer ones map less and less well. This way, small
+        differences will not be falsely returned as breakpoints. Instead, the longer (and further along) reads will
+        start mapping again, confirming the small change or single badly mapped read is not a breakpoint.
+
+    - We can make the reads overlap more, keeping the current method of construction and return, but I think that
+        a more accurate method would use reads of a variable length.
+
+    - Kept the read length at 150 bp, but made the overlap 140. Tested on the e. coli strains bl21 and k12. The
+        result is a massive SAM file (188 MB !). Visually, this file is hard to go through but borders of what seem
+        to be rearrangements are clear. The positional change is only 10bp, so it is very clear where subsequent reads
+        do not map as well as the previous ones. It is also very clear where reads begin to map again. Small
+        differences in the genome that are (likely) not rearrangement breakpoints are clearly identified as well
+        since the reads quickly begin mapping properly again.
+
+    - Pay attention to the bitwise flags (2nd column) in the SAM file as well. With this new alignment, I noticed
+        some valuable information in this field that was not apparent in my small tests.
+
+    - Need to find a "sweet spot" for read length and overlap. Consistent read positions might not matter as much
+        now, so perhaps we can use variable length. We will see how further tests go.
+
+
+14/11/21:
+    - Will be testing the heavily overlapping reads on artificial data. I kept the files I tested the older algorithm
+        on, but I would like to test on genomes that have multiple rearrangements and some other small differences,
+        such that I do not fall into the same over-sensitivity.
+
+    - After visually confirming that this method will work, I need to decide how my script will decide where borders
+        are. I can look at consecutive reads and keep track of how they map. When the end of a read crosses a
+        rearrangement, it will (should) have a lower MAPQ score than the previous read. It will also show some
+        soft-clipping in the CIGAR string (e.g. 135M15S - 135 matching base pairs and 15 soft-clipped ones). These
+        properties together should allow the script to pinpoint rearrangement breakpoints.
+
+    - Spent most of the day driving back to stellenbosch.
+
+15/11/21:
+    - Will test the algorithm on artificial data again today. Will make multiple rearrangements and use the new method
+        for creating overlapping reads. See "Experiment_7.txt" for more details.
+
+17/11/21:
+    - Needed to change the algorithm to return reads around (preceding and following) breakpoints (areas with low
+        mapq that need to be investigated).
+
+    - Have really been struggling with the code these past few days. What I want the program to do:
+        Iterate over every read, start "counting" when the program encounters a read that does not map 100% correctly.
+        Then, the program will keep track of how these reads map (position, MAPQ score, CIGAR string).
+
+18/11/21:
+    - Had a meeting with Prof who had a few helpful suggestions. We need to greatly increase the coverage. The reads
+        will now be constructed from random starting positions until the total length of all the reads is equal to
+        the coverage multiplied by the length of the original genome. This will increase the amount of times a
+        nucleotide occurs in the reads. We will then look for places where mismatches start appearing from one side
+        and assign a border to the last mapping read. This border will be backed up by other reads that contain it.
+
+    - Have successfully changed the script "find_borders_test.py" such that it returns just the part of the cigar
+        string that contains the number of matches
+
+    - Have used the result above to write a function that returns the original positions of the breakpoints themselves.
+        The result of the aforementioned deletion and mapping are shown below:
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr2 	 	 9171 	 	 r2172 	 	 44 	 93M7S
+Chr2 	 	 9171 	 	 r2355 	 	 42 	 81M19S
+Chr2 	 	 9171 	 	 r2726 	 	 41 	 75M25S
+Chr2 	 	 10444 	 	 r1477 	 	 25 	 32S68M
+Chr2 	 	 10448 	 	 r1556 	 	 18 	 36S64M
+Chr2 	 	 10430 	 	 r1580 	 	 42 	 18S82M
+Chr2 	 	 10447 	 	 r2457 	 	 21 	 35S65M
+Chr4 	 	 5602 	 	 r4268 	 	 44 	 92M8S
+Chr4 	 	 5602 	 	 r3933 	 	 41 	 74M26S
+Chr4 	 	 5602 	 	 r4057 	 	 25 	 72M28S
+Chr4 	 	 5602 	 	 r4178 	 	 25 	 71M29S
+Chr4 	 	 5602 	 	 r3650 	 	 18 	 64M36S
+Chr4 	 	 5602 	 	 r4226 	 	 12 	 60M40S
+Chr4 	 	 6126 	 	 r3749 	 	 2 	    48S52M
+Chr4 	 	 6106 	 	 r3916 	 	 25 	 28S72M
+Chr4 	 	 6101 	 	 r4323 	 	 41 	 23S77M
+Chr4 	 	 6125 	 	 r4445 	 	 2 	    47S53M
+Chr4 	 	 6088 	 	 r4541 	 	 44 	 10S90M
+Chr4 	 	 6110 	 	 r4678 	 	 21 	 32S68M
+
+    - Can clearly see that multiple reads confirm the positions of breakpoints. Where there is disagreement, I can
+        choose to trust the breakpoint that came from the read with the highest MAPQ or perhaps take the mode.
+        This is to be determined.
+
+
+19/11/21:
+    - Will test the new method on different rearrangements. This method is different to the previous ones in that
+        continuity does not matter because the reads are generated from random starting positions. This means that
+        any rearrangement should be treated the same.
+        Reciprocal map of the previous experiment:
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr2 	 	 9171 	 	 r1693 	 	 44 	 86M14S
+Chr2 	 	 9171 	 	 r2113 	 	 41 	 77M23S
+Chr2 	 	 9171 	 	 r1768 	 	 41 	 76M24S
+Chr2 	 	 9171 	 	 r2455 	 	 36 	 69M31S
+Chr2 	 	 9171 	 	 r1959 	 	 36 	 66M34S
+Chr2 	 	 9171 	 	 r1664 	 	 24 	 55M45S
+Chr2 	 	 9171 	 	 r2668 	 	 24 	 50M50S
+Chr2 	 	 9171 	 	 r2091 	 	 22 	 43M57S
+Chr2 	 	 9171 	 	 r2631 	 	 22 	 35M65S
+Chr2 	 	 9171 	 	 r2396 	 	 22 	 29M71S
+Chr2 	 	 9186 	 	 r1681 	 	 42 	 15S85M
+Chr2 	 	 9205 	 	 r1807 	 	 36 	 34S66M
+Chr2 	 	 9232 	 	 r1813 	 	 22 	 61S39M
+Chr2 	 	 9194 	 	 r1948 	 	 41 	 23S77M
+Chr2 	 	 9188 	 	 r2351 	 	 42 	 17S83M
+Chr2 	 	 9230 	 	 r2528 	 	 22 	 59S41M
+Chr2 	 	 9193 	 	 r2630 	 	 41 	 22S78M
+Chr2 	 	 9183 	 	 r2763 	 	 44 	 12S88M
+Chr2 	 	 9193 	 	 r2812 	 	 41 	 22S78M
+Chr4 	 	 5602 	 	 r4823 	 	 42 	 79M21S
+Chr4 	 	 5602 	 	 r4416 	 	 41 	 78M22S
+Chr4 	 	 5602 	 	 r4318 	 	 36 	 69M31S
+Chr4 	 	 5602 	 	 r4425 	 	 24 	 51M49S
+Chr4 	 	 5602 	 	 r4130 	 	 22 	 34M66S
+Chr4 	 	 5602 	 	 r3892 	 	 22 	 28M72S
+Chr4 	 	 5643 	 	 r3777 	 	 28 	 42S58M
+Chr4 	 	 5635 	 	 r3823 	 	 36 	 34S66M
+Chr4 	 	 5645 	 	 r3958 	 	 24 	 44S56M
+Chr4 	 	 5632 	 	 r3993 	 	 36 	 31S69M
+Chr4 	 	 5646 	 	 r4453 	 	 24 	 45S55M
+Chr4 	 	 5655 	 	 r4482 	 	 22 	 54S46M
+Chr4 	 	 5632 	 	 r4761 	 	 36 	 31S69M
+
+    In both cases, the first border (the border where the deletion took place) is exactly the same. The second border
+    has a different position because one genome contains sequences that the other does not, due to deletions.
+    Of course, what is an insertion and what is a deletion is simply a matter of perspective.
+
+    It should not matter what kind of rearrangements are made, since we are only looking at reads that do not map.
+    The exception to this is duplication which will now be tested.
+
+    Single duplication:
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 4581 	 	 r1543 	 	 25 	 30S70M
+Chr1 	 	 4577 	 	 r1554 	 	 41 	 26S74M
+Chr1 	 	 4594 	 	 r1599 	 	 9 	     43S57M
+Chr1 	 	 4572 	 	 r2523 	 	 42 	 21S79M
+Chr1 	 	 4597 	 	 r2584 	 	 2 	     46S54M
+Chr1 	 	 4574 	 	 r2639 	 	 41 	 23S77M
+Chr1 	 	 5321 	 	 r2441 	 	 44 	 98M2S
+Chr1 	 	 5321 	 	 r2222 	 	 44 	 94M6S
+Chr1 	 	 5321 	 	 r2271 	 	 44 	 93M7S
+Chr1 	 	 5321 	 	 r1627 	 	 44 	 86M14S
+Chr1 	 	 5321 	 	 r1960 	 	 42 	 84M16S
+Chr1 	 	 5321 	 	 r1754 	 	 42 	 83M17S
+Chr1 	 	 5321 	 	 r2739 	 	 9 	     54M46S
+Chr2 	 	 5532 	 	 r1693 	 	 21 	 67M33S
+Chr2 	 	 5561 	 	 r1859 	 	 25 	 30S70M
+Chr2 	 	 5546 	 	 r2105 	 	 42 	 15S85M
+
+    Again, we see borders clearly identified. Duplications are a little bit more tricky. This information (the
+    position and MAPQ score) are enough to tell where the borders are. Perhaps not to a single base pair in ALL cases,
+    but it is clear that the higher the MAPQ score, the closer the positions of the breakpoints become.
+
+    I think an algorithm that uses the MAPQs as weights could be used to narrow down on the breakpoint.
+
+    Reciprocal map of the previous experiment:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr2 	 	 5532 	 	 r1516 	 	 44 	 92M8S
+Chr2 	 	 5532 	 	 r2691 	 	 41 	 74M26S
+Chr2 	 	 5532 	 	 r2098 	 	 16 	 62M38S
+Chr2 	 	 5532 	 	 r2083 	 	 2 	     52M48S
+Chr2 	 	 5532 	 	 r2363 	 	 2 	     52M48S
+Chr2 	 	 6333 	 	 r1668 	 	 21 	 32S68M
+Chr2 	 	 6307 	 	 r1877 	 	 44 	 6S94M
+Chr2 	 	 6341 	 	 r1984 	 	 12 	 40S60M
+Chr2 	 	 6319 	 	 r2009 	 	 42 	 18S82M
+Chr2 	 	 6312 	 	 r2018 	 	 44 	 11S89M
+Chr2 	 	 6327 	 	 r2578 	 	 41 	 26S74M
+Chr2 	 	 6315 	 	 r2602 	 	 44 	 14S86M
+Chr2 	 	 6345 	 	 r2745 	 	 9 	     44S56M
+
+    In this experiment, the only reads that were returned were the borders of the duplication. In the sorted SAM file
+    there are reads in between these that all have a mapping quality of 1. It might be useful look at these reads
+    as well because they would indicate the position the duplication originated from. Nevertheless, the script
+    identified all of the borders, and only the borders. Real data is much more noisy. This means that I need a
+    function that looks at how many times a potential border is contained in a read. A foreseeable problem is that
+    the reads do not report the exact same position for the border. So, how to filter out the noise reads and keep the
+    actual ones is my next problem.
+
+    Idea: Go through the reads, give each returned potential breakpoint a weight (probably based on MAPQ). The lower
+    the MAPQ, the more allowance on either side.
+
+    Read length and coverage need to be optimised. This could be left up to the user but it would be good to have a
+    default that would work in common use.
+
+
+20/11/21:
+    - Thinking about how to group the borders. Given that the read length is 100, we definitely do not want to use
+        a read that maps the border more than 100 positions away.
+
+23/11/21:
+    - There are two strategies I am considering
+        1) Extend the border area around the breakpoint proportionately to how LOW the MAPQ is. This follows from the
+            observation that the lower the MAPQ, the further the border is assigned from the actual border. In other
+            words, if a border is assigned at 1105, with MAPQ of 44, the border will be extended by 1 bp on both sides
+            (or one side, look at the data). if another border is assigned at 1120, with a low MAPQ (10), we can
+            extend that 1120 on both sides by some number of base pairs.
+            We then look at the borders with the highest confidence and "back them up" by finding this position
+            in the extended borders of the borders with lower confidence.
+
+        2) The other strategy is to create an array of all the borders and then use Numpy.average(). This function
+            returns the average of the values in an array. When a second array is used in the argument, it is used
+            as a weight for each value. This would decrease the affect that borders with low confidence have
+            on the outcome.
+
+
+        A combination of these two strategies might work. I would get the borders that map in roughly the same area.
+        Take the border with the highest confidence as a starting point, then check if other borders fall in the same
+        region (allowing more extension for borders with bad MAPQ). I could then collect these and use these to get
+        the average (weighted). This will only really work if the "bad" borders are mapped to both sides. If they
+        are disproportionately to one side then this will pull the average away from the actual border.
+
+24/11/21:
+    - I have created a function in "find_borders_test.py" that separates the most confident breakpoints from
+        each other by looking at the positions. There is an allowance variable that allows the positions to differ
+        on either side by some integer. The high confidence borders are lists within lists. Borders that map very
+        well and are within (allowance) base pairs are in the same list.
+
+        I need to write another function or extend the current one in order to add the less confident breakpoints
+        to the lists.
+
+    - Done. Extended the function such that the borders that have lower mapq score are appended to the list containing
+        the higher mapq border, if they are within some distance (allowance variable). We can use the borders within
+        reads that had a MAPQ lower than the maximum to add confidence
+
+26/11/21:
+    - Result of algorithm:
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr2 	 	 5532 	 	 r1516 	 	 44 	 92M8S
+Chr2 	 	 5532 	 	 r2691 	 	 41 	 74M26S
+Chr2 	 	 5532 	 	 r2098 	 	 16 	 62M38S
+Chr2 	 	 5532 	 	 r2083 	 	 2 	     52M48S
+Chr2 	 	 5532 	 	 r2363 	 	 2 	     52M48S
+
+Chr2 	 	 6307 	 	 r1877 	 	 44 	 6S94M
+Chr2 	 	 6312 	 	 r2018 	 	 44 	 11S89M
+Chr2 	 	 6315 	 	 r2602 	 	 44 	 14S86M
+Chr2 	 	 6333 	 	 r1668 	 	 21 	 32S68M
+Chr2 	 	 6341 	 	 r1984 	 	 12 	 40S60M
+Chr2 	 	 6319 	 	 r2009 	 	 42 	 18S82M
+Chr2 	 	 6327 	 	 r2578 	 	 41 	 26S74M
+Chr2 	 	 6345 	 	 r2745 	 	 9 	     44S56M
+
+The borders with the highest confidence are extracted from the rest and then grouped by position. Then, the remaining
+borders are compared with the high confidence borders. If they are within an allowable distance from a high confidence
+border, they are added to the list.
+
+    - It is time to test on a different file with rearrangements in different places.
+        The multichromosomal test genome "lv_mc.fa" will be rearranged to include a deletion and a translocation.
+        The new file will be named "exp7_3.fa" and reads will be constructed from it and mapped reciprocally to the
+        original lv_mc.fa file. I will keep track of the positions of the breakpoints to evaluate the accuracy.
+
+    - (I still need to think of a way to report the total confidence.)
+
+    - Rearrangements: Deletion of 140 bp at position 1330 (up to position 1470) on chromosome 1.
+
+    - Translocation (150bp) from position 700 on chromosome 3 to end of chromosome 4
+
+Mapping:
+Rearranged onto original:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 1333 	 	 r356 	 	 44 	 99M1S
+Chr1 	 	 1333 	 	 r1038 	 	 44 	 93M7S
+Chr1 	 	 1333 	 	 r381 	 	 21 	 67M33S
+Chr1 	 	 1333 	 	 r726 	 	 21 	 67M33S
+Chr1 	 	 1333 	 	 r32 	 	 18 	 64M36S
+Chr1 	 	 1333 	 	 r302 	 	 16 	 62M38S
+Chr1 	 	 1333 	 	 r767 	 	 16 	 62M38S
+
+Chr1 	 	 1481 	 	 r627 	 	 44 	 10S90M
+Chr1 	 	 1489 	 	 r571 	 	 42 	 18S82M
+Chr1 	 	 1504 	 	 r662 	 	 21 	 33S67M
+Chr1 	 	 1519 	 	 r1121 	 	 2 	     48S52M
+Chr1 	 	 1501 	 	 r1126 	 	 25 	 30S70M
+Chr1 	 	 1511 	 	 r1216 	 	 12 	 40S60M
+
+Chr3 	 	 709 	 	 r4323 	 	 44 	 8S92M
+Chr3 	 	 701 	 	 r3460 	 	 42 	 83M17S
+Chr3 	 	 701 	 	 r3312 	 	 42 	 82M18S
+Chr3 	 	 701 	 	 r2979 	 	 41 	 73M27S
+Chr3 	 	 701 	 	 r3446 	 	 21 	 67M33S
+Chr3 	 	 701 	 	 r3591 	 	 9 	     55M45S
+Chr3 	 	 701 	 	 r3463 	 	 9 	     54M46S
+Chr3 	 	 722 	 	 r4245 	 	 42 	 21S79M
+Chr3 	 	 746 	 	 r4362 	 	 9 	     45S55M
+Chr3 	 	 717 	 	 r4755 	 	 42 	 16S84M
+
+Chr3 	 	 858 	 	 r3587 	 	 44 	 7S93M
+Chr3 	 	 883 	 	 r3160 	 	 25 	 32S68M
+Chr3 	 	 875 	 	 r3213 	 	 41 	 24S76M
+Chr3 	 	 892 	 	 r3471 	 	 12 	 41S59M
+
+Chr4 	 	 10773 	 	 r4340 	 	 44 	 88M12S
+
+
+Original mapped onto rearranged:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 1333 	 	 r701 	 	 44 	 99M1S
+Chr1 	 	 1333 	 	 r1293 	 	 44 	 93M7S
+Chr1 	 	 1342 	 	 r33 	 	 44 	 11S89M
+Chr1 	 	 1333 	 	 r558 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r745 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r842 	 	 22 	 49M51S
+Chr1 	 	 1333 	 	 r985 	 	 22 	 34M66S
+Chr1 	 	 1333 	 	 r1156 	 	 22 	 28M72S
+Chr1 	 	 1333 	 	 r1301 	 	 22 	 28M72S
+Chr1 	 	 1366 	 	 r337 	 	 36 	 35S65M
+Chr1 	 	 1356 	 	 r1040 	 	 41 	 25S75M
+
+Chr3 	 	 701 	 	 r3577 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3608 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3274 	 	 44 	 95M5S
+Chr3 	 	 701 	 	 r2973 	 	 44 	 94M6S
+Chr3 	 	 710 	 	 r3747 	 	 44 	 9S91M
+Chr3 	 	 701 	 	 r3477 	 	 25 	 71M29S
+Chr3 	 	 701 	 	 r2978 	 	 25 	 68M32S
+Chr3 	 	 701 	 	 r3502 	 	 21 	 67M33S
+Chr3 	 	 701 	 	 r3152 	 	 9 	     57M43S
+Chr3 	 	 701 	 	 r3520 	 	 2 	     53M47S
+Chr3 	 	 744 	 	 r3191 	 	 9 	     43S57M
+Chr3 	 	 719 	 	 r3213 	 	 42 	 18S82M
+Chr3 	 	 728 	 	 r3215 	 	 41 	 27S73M
+
+Chr4 	 	 10777 	 	 r3360 	 	 44 	 4S96M
+Chr4 	 	 10786 	 	 r3737 	 	 44 	 13S87M
+Chr4 	 	 10822 	 	 r3006 	 	 2 	     49S51M
+Chr4 	 	 10817 	 	 r3062 	 	 9 	     44S56M
+Chr4 	 	 10800 	 	 r3536 	 	 41 	 27S73M
+
+Chr4 	 	 10923 	 	 r2989 	 	 44 	 98M2S
+Chr4 	 	 10923 	 	 r3204 	 	 41 	 76M24S
+Chr4 	 	 10923 	 	 r3052 	 	 37 	 72M28S
+Chr4 	 	 10923 	 	 r3424 	 	 9 	     55M45S
+Chr4 	 	 10923 	 	 r3111 	 	 2 	     51M49S
+
+Chr1 	 	 1399 	 	 r485 	 	 22 	 68S32M
+
+Chr1 	 	 1389 	 	 r802 	 	 22 	 58S42M
+
+Chr1 	 	 1390 	 	 r1182 	 	 22 	 59S41M
+
+
+Discussion:
+    - I noticed something VERY IMPORTANT. I have overlooked an important detail. I noticed that for the reads that
+        start mapping and then stop (have M - for match before S - for soft-clipped) the correct positions are
+        returned for the breakpoints. In the other case where reads start with soft-clipped bases the positions are
+        off. This is because when a base is marked as soft-clipped, the position is NOT changed. This means that
+        I should not be adjusting the position of the reads in this case. I will change the script and check the
+        results.
+
+    - Changed script to NO LONGER adjust the position of the breakpoints that start out as soft-clipped.
+        Results:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 1333 	 	 r701 	 	 44 	 99M1S
+Chr1 	 	 1333 	 	 r1293 	 	 44 	 93M7S
+Chr1 	 	 1331 	 	 r33 	 	 44 	 11S89M
+Chr1 	 	 1333 	 	 r558 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r745 	 	 36 	 69M31S
+Chr1 	 	 1333 	 	 r842 	 	 22 	 49M51S
+Chr1 	 	 1333 	 	 r985 	 	 22 	 34M66S
+Chr1 	 	 1333 	 	 r1156 	 	 22 	 28M72S
+Chr1 	 	 1333 	 	 r1301 	 	 22 	 28M72S
+Chr1 	 	 1331 	 	 r337 	 	 36 	 35S65M
+Chr1 	 	 1331 	 	 r485 	 	 22 	 68S32M
+Chr1 	 	 1331 	 	 r802 	 	 22 	 58S42M
+Chr1 	 	 1331 	 	 r1040 	 	 41 	 25S75M
+Chr1 	 	 1331 	 	 r1182 	 	 22 	 59S41M
+
+Chr3 	 	 701 	 	 r3577 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3608 	 	 44 	 99M1S
+Chr3 	 	 701 	 	 r3274 	 	 44 	 95M5S
+Chr3 	 	 701 	 	 r2973 	 	 44 	 94M6S
+Chr3 	 	 701 	 	 r3747 	 	 44 	 9S91M
+Chr3 	 	 701 	 	 r3477 	 	 25 	 71M29S
+Chr3 	 	 701 	 	 r2978 	 	 25 	 68M32S
+Chr3 	 	 701 	 	 r3502 	 	 21 	 67M33S
+Chr3 	 	 701 	 	 r3152 	 	 9 	     57M43S
+Chr3 	 	 701 	 	 r3520 	 	 2 	     53M47S
+Chr3 	 	 701 	 	 r3191 	 	 9 	     43S57M
+Chr3 	 	 701 	 	 r3213 	 	 42 	 18S82M
+Chr3 	 	 701 	 	 r3215 	 	 41 	 27S73M
+
+Chr4 	 	 10773 	 	 r3360 	 	 44 	 4S96M
+Chr4 	 	 10773 	 	 r3737 	 	 44 	 13S87M
+Chr4 	 	 10773 	 	 r3006 	 	 2 	     49S51M
+Chr4 	 	 10773 	 	 r3062 	 	 9 	     44S56M
+Chr4 	 	 10773 	 	 r3536 	 	 41 	 27S73M
+
+Chr4 	 	 10923 	 	 r2989 	 	 44 	 98M2S
+Chr4 	 	 10923 	 	 r3204 	 	 41 	 76M24S
+Chr4 	 	 10923 	 	 r3052 	 	 37 	 72M28S
+Chr4 	 	 10923 	 	 r3424 	 	 9 	     55M45S
+Chr4 	 	 10923 	 	 r3111 	 	 2 	     51M49S
+
+    Discussion: Holy shit... it works.
+    I have verified that the positions returned are NOT simply a bug or error that returns the same value. These
+    positions are derived from the SAM file. These results are fantastic. There are so many reads that support the
+    reads that map with high confidence.
+
+
+27/11/21:
+    - Will perform the same kind of test again. Again using the same test genome but with different rearrangements.
+    Experiment 7.5:
+    Rearrangements:
+    - Reversal
+        420bp from position 1 on chromosome 2, to position 420. 421 should be first mapping base in chromosome 2.
+
+    - Deletion
+        210 bp deleted from position 700 to 910 on chromosome 1. Should see borders at 700 and at 911
+
+    - Duplication
+        280 bp from position 1 on chromosome 4 were duplicated to the end of chromosome 4.
+
+Results: mapping rearranged onto original
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r957 	 	 44 	 87M13S
+Chr1 	 	 701 	 	 r280 	 	 42 	 17S83M
+Chr1 	 	 701 	 	 r798 	 	 42 	 21S79M
+Chr1 	 	 701 	 	 r895 	 	 28 	 62M38S
+Chr1 	 	 701 	 	 r114 	 	 22 	 49M51S
+Chr1 	 	 701 	 	 r737 	 	 22 	 42M58S
+Chr1 	 	 701 	 	 r96 	 	 22 	 28M72S
+Chr1 	 	 701 	 	 r698 	 	 22 	 57S43M
+Chr1 	 	 701 	 	 r785 	 	 22 	 54S46M
+Chr1 	 	 701 	 	 r1276 	 	 28 	 41S59M
+Chr1 	 	 701 	 	 r1328 	 	 36 	 35S65M
+Chr1 	 	 701 	 	 r1453 	 	 36 	 30S70M
+
+Chr2 	 	 421 	 	 r1932 	 	 41 	 25S75M
+Chr2 	 	 421 	 	 r2593 	 	 41 	 28S72M
+Chr2 	 	 421 	 	 r1471 	 	 22 	 61S39M
+Chr2 	 	 421 	 	 r1477 	 	 28 	 38S62M
+Chr2 	 	 421 	 	 r1595 	 	 22 	 61S39M
+Chr2 	 	 421 	 	 r1672 	 	 22 	 69S31M
+Chr2 	 	 421 	 	 r1784 	 	 22 	 54S46M
+Chr2 	 	 421 	 	 r2052 	 	 28 	 37S63M
+Chr2 	 	 421 	 	 r2118 	 	 36 	 32S68M
+Chr2 	 	 421 	 	 r2259 	 	 22 	 55S45M
+Chr2 	 	 421 	 	 r2775 	 	 22 	 65S35M
+
+The border for the deletion is correct. Need to check why it is off by 1 base. This could be a case of a base
+being replaced with the same base that used to be there. The other rearrangement and borders are  not clear from this
+result, but the reciprocal mapping should reveal them. The first border from the reversal is not shown, as there are
+no reads that map before position 421 on chromosome 2.
+
+Reciprocal map:
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 911 	 	 r539 	 	 41 	 23S77M
+Chr1 	 	 911 	 	 r740 	 	 41 	 22S78M
+Chr1 	 	 911 	 	 r1057 	 	 44 	 4S96M
+Chr1 	 	 911 	 	 r1197 	 	 41 	 24S76M
+Chr1 	 	 911 	 	 r1314 	 	 42 	 17S83M
+Chr1 	 	 911 	 	 r1060 	 	 9 	     45S55M
+
+Chr2 	 	 421 	 	 r2301 	 	 44 	 14S86M
+Chr2 	 	 421 	 	 r1509 	 	 22 	 66S34M
+Chr2 	 	 421 	 	 r2782 	 	 22 	 67S33M
+
+Chr4 	 	 1 	 	     r4338 	 	 44 	 14S86M
+Chr4 	 	 1 	 	     r4348 	 	 44 	 11S89M
+Chr4 	 	 1 	 	     r4767 	 	 41 	 24S76M
+Chr4 	 	 1 	 	     r4771 	 	 44 	 5S95M
+Chr4 	 	 1 	 	     r4817 	 	 42 	 21S79M
+Chr4 	 	 1 	 	     r3768 	 	 25 	 31S69M
+Chr4 	 	 1 	 	     r4408 	 	 18 	 36S64M
+Chr4 	 	 1 	 	     r4715 	 	 9 	     45S55M
+
+Chr4 	 	 10773 	 	 r4804 	 	 25 	 69M31S
+
+Chr4 	 	 10773 	 	 r3878 	 	 21 	 66M34S
+
+Chr4 	 	 10773 	 	 r4064 	 	 16 	 62M38S
+
+Chr4 	 	 10773 	 	 r4077 	 	 22 	 33M67S
+
+
+Firstly, I need to go through the list of reads that are left over at the end and try to group them as well. There
+are no high confidence reads confirming the breakpoint at 10773 on chromosome 4, but with 4 adjusted reads pointing
+to the same place I think it should be included.
+
+The other deletion border is clear at position 911 on chromosome 1, exactly where it was predicted (made, rather).
+
+The reads that were part of the duplication are not immediately obvious. I need to spend some time trying to
+understand the return.
+
+
+30/11/21:
+    - Spoke to Prof and showed my results in the meeting today. Advice:
+        Do not use the term "adjusted position", instead refer to these as breakpoints or rearrangement borders.
+        I can use this laptop until the end of January.
+        There is a lot of work to be done.
+        Run more tests and figure out if there is way to make the duplications "look better"?
+
+    - Experiment 8:
+        - First, I will use the same two genomes from the previous experiment, but I will adjust the coverage and read
+            length, independently.
+
+    Experiment 8_1:
+        - Same genomes but will make reads of length 200.
+        Result: Rearranged mapped onto original
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r165 	 	 44 	 199M1S
+Chr1 	 	 701 	 	 r103 	 	 44 	 196M4S
+Chr1 	 	 701 	 	 r401 	 	 44 	 194M6S
+Chr1 	 	 701 	 	 r415 	 	 44 	 191M9S
+Chr1 	 	 701 	 	 r131 	 	 25 	 147M53S
+Chr1 	 	 701 	 	 r712 	 	 21 	 138M62S
+Chr1 	 	 701 	 	 r212 	 	 17 	 125M75S
+Chr1 	 	 701 	 	 r661 	 	 17 	 125M75S
+Chr1 	 	 701 	 	 r650 	 	 17 	 122M78S
+Chr1 	 	 701 	 	 r448 	 	 2 	     103M97S
+
+Chr1 	 	 911 	 	 r329 	 	 44 	 15S185M
+Chr1 	 	 911 	 	 r419 	 	 44 	 20S180M
+Chr1 	 	 911 	 	 r76 	 	 38 	 38S162M
+Chr1 	 	 911 	 	 r258 	 	 25 	 51S149M
+Chr1 	 	 911 	 	 r297 	 	 17 	 75S125M
+Chr1 	 	 911 	 	 r454 	 	 17 	 78S122M
+Chr1 	 	 911 	 	 r502 	 	 2 	     94S106M
+Chr1 	 	 911 	 	 r645 	 	 18 	 71S129M
+Chr1 	 	 911 	 	 r700 	 	 38 	 33S167M
+
+Chr2 	 	 421 	 	 r1112 	 	 44 	 3S197M
+Chr2 	 	 421 	 	 r1293 	 	 42 	 43S157M
+Chr2 	 	 421 	 	 r730 	 	 28 	 89S111M
+Chr2 	 	 421 	 	 r738 	 	 36 	 68S132M
+Chr2 	 	 421 	 	 r989 	 	 22 	 140S60M
+Chr2 	 	 421 	 	 r1152 	 	 28 	 100S100M
+Chr2 	 	 421 	 	 r1232 	 	 36 	 75S125M
+
+Chr4 	 	 1 	 	     r2148 	 	 44 	 19S181M
+
+Chr4 	 	 10773 	 	 r1953 	 	 38 	 166M34S
+
+Chr4 	 	 10773 	 	 r1904 	 	 38 	 165M35S
+
+Chr4 	 	 10773 	 	 r2269 	 	 21 	 136M64S
+
+Chr4 	 	 10773 	 	 r1998 	 	 17 	 124M76S
+
+    - This result is interesting because even though there seem to be less "hits" on any given border, the output
+        contains ALL the borders. In the previous experiment, neither output contained all of the borders.
+
+Mapping original onto rearranged: exp8_2
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r706 	 	 44 	 187M13S
+Chr1 	 	 701 	 	 r13 	 	 41 	 134M66S
+Chr1 	 	 701 	 	 r32 	 	 44 	 19S181M
+Chr1 	 	 701 	 	 r296 	 	 42 	 38S162M
+Chr1 	 	 701 	 	 r305 	 	 44 	 23S177M
+Chr1 	 	 701 	 	 r340 	 	 44 	 11S189M
+Chr1 	 	 701 	 	 r522 	 	 36 	 126M74S
+Chr1 	 	 701 	 	 r722 	 	 36 	 124M76S
+Chr1 	 	 701 	 	 r515 	 	 36 	 117M83S
+Chr1 	 	 701 	 	 r470 	 	 28 	 113M87S
+Chr1 	 	 701 	 	 r311 	 	 28 	 87S113M
+Chr1 	 	 701 	 	 r577 	 	 36 	 71S129M
+Chr1 	 	 701 	 	 r587 	 	 24 	 106S94M
+
+Chr2 	 	 421 	 	 r1087 	 	 44 	 26S174M
+Chr2 	 	 421 	 	 r880 	 	 28 	 100S100M
+Chr2 	 	 421 	 	 r1218 	 	 22 	 169S31M
+Chr2 	 	 421 	 	 r1219 	 	 22 	 166S34M
+Chr2 	 	 421 	 	 r1243 	 	 28 	 87S113M
+Chr2 	 	 421 	 	 r1288 	 	 24 	 114S86M
+
+    - This output has roughly the same amount of "hits" on the borders as the previous (exp7_5).
+
+        Next, I will increase the coverage to 20x and keep the read length at 200:
+    Rearranged mapped onto original: exp8_3
+
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r957 	 	 44 	 194M6S
+Chr1 	 	 701 	 	 r1289 	 	 44 	 179M21S
+Chr1 	 	 701 	 	 r669 	 	 44 	 172M28S
+Chr1 	 	 701 	 	 r62 	 	 38 	 163M37S
+Chr1 	 	 701 	 	 r982 	 	 37 	 156M44S
+Chr1 	 	 701 	 	 r278 	 	 18 	 131M69S
+Chr1 	 	 701 	 	 r135 	 	 17 	 124M76S
+
+Chr1 	 	 911 	 	 r6 	 	 44 	 25S175M
+Chr1 	 	 911 	 	 r572 	 	 44 	 8S192M
+Chr1 	 	 911 	 	 r504 	 	 21 	 59S141M
+Chr1 	 	 911 	 	 r691 	 	 37 	 43S157M
+Chr1 	 	 911 	 	 r799 	 	 9 	     87S113M
+Chr1 	 	 911 	 	 r1028 	 	 9 	     85S115M
+Chr1 	 	 911 	 	 r1118 	 	 21 	 64S136M
+Chr1 	 	 911 	 	 r1407 	 	 37 	 47S153M
+
+Chr2 	 	 421 	 	 r1834 	 	 44 	 6S194M
+Chr2 	 	 421 	 	 r1923 	 	 44 	 21S179M
+Chr2 	 	 421 	 	 r2105 	 	 44 	 20S180M
+Chr2 	 	 421 	 	 r2106 	 	 44 	 30S170M
+Chr2 	 	 421 	 	 r2712 	 	 42 	 49S151M
+Chr2 	 	 421 	 	 r1632 	 	 22 	 137S63M
+Chr2 	 	 421 	 	 r1816 	 	 22 	 128S72M
+Chr2 	 	 421 	 	 r1821 	 	 28 	 100S100M
+Chr2 	 	 421 	 	 r1823 	 	 28 	 92S108M
+Chr2 	 	 421 	 	 r1935 	 	 22 	 120S80M
+Chr2 	 	 421 	 	 r2099 	 	 22 	 134S66M
+Chr2 	 	 421 	 	 r2120 	 	 22 	 124S76M
+Chr2 	 	 421 	 	 r2224 	 	 28 	 88S112M
+Chr2 	 	 421 	 	 r2255 	 	 36 	 68S132M
+Chr2 	 	 421 	 	 r2296 	 	 22 	 133S67M
+Chr2 	 	 421 	 	 r2381 	 	 24 	 106S94M
+Chr2 	 	 421 	 	 r2522 	 	 36 	 68S132M
+Chr2 	 	 421 	 	 r2607 	 	 36 	 80S120M
+
+Chr4 	 	 1 	 	 r3909 	 	 44 	 9S191M
+Chr4 	 	 1 	 	 r4080 	 	 44 	 1S199M
+Chr4 	 	 1 	 	 r4850 	 	 44 	 2S198M
+Chr4 	 	 1 	 	 r3879 	 	 37 	 44S156M
+Chr4 	 	 1 	 	 r4113 	 	 25 	 57S143M
+Chr4 	 	 1 	 	 r4459 	 	 17 	 76S124M
+Chr4 	 	 1 	 	 r4513 	 	 37 	 42S158M
+Chr4 	 	 1 	 	 r4777 	 	 37 	 46S154M
+
+Chr4 	 	 10773 	 	 r4242 	 	 44 	 194M6S
+Chr4 	 	 10773 	 	 r4846 	 	 44 	 170M30S
+Chr4 	 	 10773 	 	 r4735 	 	 39 	 168M32S
+Chr4 	 	 10773 	 	 r4128 	 	 38 	 160M40S
+Chr4 	 	 10773 	 	 r4110 	 	 25 	 148M52S
+Chr4 	 	 10773 	 	 r4292 	 	 17 	 121M79S
+Chr4 	 	 10773 	 	 r4402 	 	 17 	 117M83S
+Chr4 	 	 10773 	 	 r4409 	 	 9 	     111M89S
+Chr4 	 	 10773 	 	 r3924 	 	 28 	 100M100S
+
+Reciprocal (mapping original onto rearranged):
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r112 	 	 44 	 182M18S
+Chr1 	 	 701 	 	 r242 	 	 44 	 168M32S
+Chr1 	 	 701 	 	 r580 	 	 42 	 152M48S
+Chr1 	 	 701 	 	 r896 	 	 41 	 147M53S
+Chr1 	 	 701 	 	 r960 	 	 41 	 147M53S
+Chr1 	 	 701 	 	 r577 	 	 41 	 51S149M
+Chr1 	 	 701 	 	 r640 	 	 44 	 31S169M
+Chr1 	 	 701 	 	 r669 	 	 41 	 57S143M
+Chr1 	 	 701 	 	 r735 	 	 41 	 61S139M
+Chr1 	 	 701 	 	 r1225 	 	 41 	 66S134M
+Chr1 	 	 701 	 	 r1390 	 	 42 	 36S164M
+Chr1 	 	 701 	 	 r1113 	 	 36 	 131M69S
+Chr1 	 	 701 	 	 r888 	 	 28 	 113M87S
+Chr1 	 	 701 	 	 r280 	 	 28 	 103M97S
+Chr1 	 	 701 	 	 r386 	 	 28 	 101M99S
+Chr1 	 	 701 	 	 r1165 	 	 22 	 77M123S
+Chr1 	 	 701 	 	 r232 	 	 22 	 55M145S
+Chr1 	 	 701 	 	 r651 	 	 22 	 53M147S
+Chr1 	 	 701 	 	 r1439 	 	 22 	 53M147S
+Chr1 	 	 701 	 	 r435 	 	 22 	 50M150S
+Chr1 	 	 701 	 	 r982 	 	 22 	 50M150S
+Chr1 	 	 701 	 	 r1418 	 	 22 	 48M152S
+Chr1 	 	 701 	 	 r877 	 	 22 	 47M153S
+Chr1 	 	 701 	 	 r568 	 	 22 	 125S75M
+Chr1 	 	 701 	 	 r588 	 	 22 	 135S65M
+Chr1 	 	 701 	 	 r622 	 	 36 	 84S116M
+Chr1 	 	 701 	 	 r634 	 	 28 	 86S114M
+Chr1 	 	 701 	 	 r705 	 	 22 	 129S71M
+Chr1 	 	 701 	 	 r937 	 	 22 	 126S74M
+Chr1 	 	 701 	 	 r988 	 	 24 	 105S95M
+Chr1 	 	 701 	 	 r1143 	 	 36 	 77S123M
+Chr1 	 	 701 	 	 r1168 	 	 36 	 76S124M
+Chr1 	 	 701 	 	 r1254 	 	 36 	 69S131M
+Chr1 	 	 701 	 	 r1413 	 	 36 	 70S130M
+
+Chr2 	 	 421 	 	 r1509 	 	 44 	 11S189M
+Chr2 	 	 421 	 	 r1553 	 	 44 	 12S188M
+Chr2 	 	 421 	 	 r1589 	 	 44 	 19S181M
+Chr2 	 	 421 	 	 r1803 	 	 42 	 42S158M
+Chr2 	 	 421 	 	 r2276 	 	 44 	 8S192M
+Chr2 	 	 421 	 	 r1580 	 	 24 	 117S83M
+Chr2 	 	 421 	 	 r2113 	 	 24 	 107S93M
+Chr2 	 	 421 	 	 r2536 	 	 28 	 87S113M
+Chr2 	 	 421 	 	 r2554 	 	 28 	 91S109M
+Chr2 	 	 421 	 	 r2729 	 	 24 	 111S89M
+Chr2 	 	 421 	 	 r2743 	 	 24 	 111S89M
+Chr2 	 	 421 	 	 r2777 	 	 36 	 78S122M
+Chr2 	 	 421 	 	 r2876 	 	 22 	 151S49M
+
+Discussion:
+    - Increasing the coverage drastically increased the number of hits on the borders.
+        The border of the duplication is now contained in multiple high confidence reads.
+        However, it is not clear from the output what is actually happening there. There cannot be a rearrangement
+        border at only the first position of chromosome 4. The border of the duplication is actually the one at
+        position 10773 on chromosome 4.
+
+Want to test 100 read length with 20x coverage:
+Rearranged mapped onto original: exp8_5.sam
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r705 	 	 44 	 98M2S
+Chr1 	 	 701 	 	 r2615 	 	 44 	 96M4S
+Chr1 	 	 701 	 	 r298 	 	 44 	 92M8S
+Chr1 	 	 701 	 	 r1080 	 	 44 	 89M11S
+Chr1 	 	 701 	 	 r2630 	 	 44 	 89M11S
+Chr1 	 	 701 	 	 r2471 	 	 41 	 77M23S
+Chr1 	 	 701 	 	 r1272 	 	 41 	 74M26S
+Chr1 	 	 701 	 	 r2401 	 	 41 	 74M26S
+Chr1 	 	 701 	 	 r2841 	 	 41 	 73M27S
+Chr1 	 	 701 	 	 r417 	 	 25 	 70M30S
+Chr1 	 	 701 	 	 r467 	 	 16 	 61M39S
+Chr1 	 	 701 	 	 r2562 	 	 2 	     52M48S
+Chr1 	 	 701 	 	 r2641 	 	 2 	     52M48S
+
+Chr1 	 	 911 	 	 r120 	 	 41 	 22S78M
+Chr1 	 	 911 	 	 r1248 	 	 44 	 4S96M
+Chr1 	 	 911 	 	 r1504 	 	 44 	 11S89M
+Chr1 	 	 911 	 	 r1945 	 	 44 	 7S93M
+Chr1 	 	 911 	 	 r2099 	 	 44 	 8S92M
+Chr1 	 	 911 	 	 r112 	 	 21 	 35S65M
+Chr1 	 	 911 	 	 r957 	 	 21 	 34S66M
+Chr1 	 	 911 	 	 r1232 	 	 2 	     47S53M
+Chr1 	 	 911 	 	 r1491 	 	 21 	 33S67M
+Chr1 	 	 911 	 	 r1529 	 	 2 	     48S52M
+Chr1 	 	 911 	 	 r1855 	 	 37 	 28S72M
+Chr1 	 	 911 	 	 r2130 	 	 9 	     43S57M
+Chr1 	 	 911 	 	 r2280 	 	 25 	 30S70M
+Chr1 	 	 911 	 	 r2573 	 	 21 	 33S67M
+
+Chr2 	 	 421 	 	 r3150 	 	 42 	 21S79M
+Chr2 	 	 421 	 	 r3256 	 	 41 	 24S76M
+Chr2 	 	 421 	 	 r3544 	 	 41 	 22S78M
+Chr2 	 	 421 	 	 r4501 	 	 41 	 22S78M
+Chr2 	 	 421 	 	 r3063 	 	 36 	 32S68M
+Chr2 	 	 421 	 	 r3087 	 	 22 	 64S36M
+Chr2 	 	 421 	 	 r3871 	 	 28 	 43S57M
+Chr2 	 	 421 	 	 r3896 	 	 36 	 36S64M
+Chr2 	 	 421 	 	 r4424 	 	 28 	 38S62M
+Chr2 	 	 421 	 	 r4881 	 	 36 	 33S67M
+Chr2 	 	 421 	 	 r4990 	 	 24 	 44S56M
+Chr2 	 	 421 	 	 r5350 	 	 22 	 69S31M
+
+Chr4 	 	 1 	 	 r7686 	 	     42 	 16S84M
+Chr4 	 	 1 	 	 r7692 	 	     42 	 17S83M
+Chr4 	 	 1 	 	 r8952 	 	     44 	 2S98M
+Chr4 	 	 1 	 	 r7873 	 	     9 	     46S54M
+Chr4 	 	 1 	 	 r8581 	 	     9 	     45S55M
+
+Chr4 	 	 10773 	 	 r8275 	 	 44 	 91M9S
+Chr4 	 	 10773 	 	 r7559 	 	 44 	 89M11S
+Chr4 	 	 10773 	 	 r9639 	 	 42 	 85M15S
+Chr4 	 	 10773 	 	 r8640 	 	 42 	 84M16S
+Chr4 	 	 10773 	 	 r7964 	 	 25 	 69M31S
+Chr4 	 	 10773 	 	 r8586 	 	 12 	 60M40S
+Chr4 	 	 10773 	 	 r9135 	 	 9 	     54M46S
+
+
+Original mapped onto rearranged: exp8_6.sam
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string
+Chr1 	 	 701 	 	 r57 	 	 44 	 99M1S
+Chr1 	 	 701 	 	 r204 	 	 44 	 92M8S
+Chr1 	 	 701 	 	 r910 	 	 44 	 86M14S
+Chr1 	 	 701 	 	 r2761 	 	 41 	 74M26S
+Chr1 	 	 701 	 	 r326 	 	 41 	 22S78M
+Chr1 	 	 701 	 	 r938 	 	 42 	 19S81M
+Chr1 	 	 701 	 	 r1767 	 	 44 	 11S89M
+Chr1 	 	 701 	 	 r2279 	 	 44 	 14S86M
+Chr1 	 	 701 	 	 r2481 	 	 36 	 64M36S
+Chr1 	 	 701 	 	 r1050 	 	 24 	 51M49S
+Chr1 	 	 701 	 	 r1458 	 	 22 	 44M56S
+Chr1 	 	 701 	 	 r1698 	 	 22 	 44M56S
+Chr1 	 	 701 	 	 r1932 	 	 22 	 43M57S
+Chr1 	 	 701 	 	 r2518 	 	 22 	 40M60S
+Chr1 	 	 701 	 	 r305 	 	 24 	 49S51M
+Chr1 	 	 701 	 	 r716 	 	 22 	 69S31M
+Chr1 	 	 701 	 	 r1218 	 	 36 	 30S70M
+Chr1 	 	 701 	 	 r1399 	 	 24 	 45S55M
+Chr1 	 	 701 	 	 r1802 	 	 28 	 37S63M
+Chr1 	 	 701 	 	 r1874 	 	 24 	 47S53M
+Chr1 	 	 701 	 	 r2024 	 	 24 	 49S51M
+Chr1 	 	 701 	 	 r2678 	 	 22 	 64S36M
+
+Chr2 	 	 421 	 	 r3541 	 	 44 	 7S93M
+Chr2 	 	 421 	 	 r3649 	 	 44 	 13S87M
+Chr2 	 	 421 	 	 r4245 	 	 44 	 5S95M
+Chr2 	 	 421 	 	 r4477 	 	 42 	 16S84M
+Chr2 	 	 421 	 	 r4684 	 	 41 	 27S73M
+Chr2 	 	 421 	 	 r5234 	 	 44 	 8S92M
+Chr2 	 	 421 	 	 r5662 	 	 44 	 9S91M
+Chr2 	 	 421 	 	 r5789 	 	 44 	 7S93M
+Chr2 	 	 421 	 	 r2948 	 	 22 	 63S37M
+Chr2 	 	 421 	 	 r2953 	 	 28 	 37S63M
+Chr2 	 	 421 	 	 r3824 	 	 22 	 72S28M
+Chr2 	 	 421 	 	 r4376 	 	 22 	 67S33M
+Chr2 	 	 421 	 	 r4713 	 	 22 	 67S33M
+Chr2 	 	 421 	 	 r4810 	 	 22 	 55S45M
+Chr2 	 	 421 	 	 r4952 	 	 22 	 51S49M
+Chr2 	 	 421 	 	 r5074 	 	 24 	 48S52M
+Chr2 	 	 421 	 	 r5237 	 	 36 	 30S70M
+Chr2 	 	 421 	 	 r5356 	 	 36 	 33S67M
+Chr2 	 	 421 	 	 r5373 	 	 22 	 69S31M
+Chr2 	 	 421 	 	 r5468 	 	 22 	 70S30M
+Chr2 	 	 421 	 	 r5829 	 	 24 	 46S54M
+
+
+Discussion:
+recap:
+    - exp8_1 and exp8_2 ~ 200 read length, 10x coverage
+    - exp8_3 and exp8_4 ~ 200 read length, 20x coverage
+    - exp8_5 and exp8_6 ~ 100 read length, 20x coverage
+
+TODO Finish discussion
