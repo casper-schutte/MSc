@@ -1,0 +1,110 @@
+22/06/21
+
+Notes on Bowtie2:
+At this time the aim is to investigate the feasibility of
+using Bowtie2 to map reads of one genome onto another and
+vice versa. I am currently reading the documentation in
+the bowtie2 manual and there are many aspects to consider
+and keep in mind.
+
+Different modes of reporting alignments.
+Default mode (search for multiple alignments and report
+the best one) will be used initially. My initial experiment
+will simply introduce a few large rearrangements to a small
+example genome and investigate whether bowtie2 and SAMtools
+will be sufficient to identify rearrangements (and their
+breakpoints). If ambiguity becomes a problem, consider
+a different reporting mode.
+In alternative reporting modes, the user can choose to have
+all valid alignments returned (-a mode) or specify an upper
+threshold for returned alignments (-k mode). Perhaps reporting lower-scoring
+alignments would be helpful for finding specific kinds of rearrangements.
+Update: After initial testing with default mode, I will also test using
+the other modes.
+
+Randomness:
+There is randomness in the way bowtie2 chooses alignments.
+When there are equally-good choices for where a read can map,
+it uses a pseudo-randomly generated number to choose of them.
+The seed for the RNG changes for each read BUT the seed can
+set with "--seed" such that the same seed is used, making
+alignments a reproducible action.
+An important consideration is whether the bowtie2 python wrapper will
+allow me the same level of control over the parameters.
+
+
+Notes 25/06/21
+Read through bowtie2 documentation. Practiced using the tool with the
+example genome and reads in the "example" folder (also samtools and bcftools)
+There is a perl script for generating reads included with bowtie2, but writing a python
+script that I can control and understand would be better. This is where those simulation programs might come
+in handy, generating realistic read data. At this point, I am looking at making simple rearrangements and testing
+whether I can find them visually. Think about the file formats, how are alignments (and misalignments) reported?
+Testing paired-end alignment and variant calling using BCFtools, but this might not be what I want to do.
+
+
+Notes 07/07/21:
+I extracted the sequence data from fastA file, verified that no seq data was lost.
+(also need to remember that reads will have quality scores, so the script will have to extract the
+sequence and the associated quality score).
+Need to make reads and keep track of their position, perhaps using a dictionary
+Need to verify that bowtie2 will accept my reads and perform alignments (might need quality scores)
+Think about to report the "worst" fits for alignments. Try mapping in order and then returning areas
+that don't map to iteratively find more alignments. This will let me construct synteny blocks
+(blocks of sequences that either rearranged or did not).
+
+
+Notes 12/07/21:
+Today I will write a script that makes reads from a sequence. Things to consider: Read length should be
+150 - 300 bp to represent Illumina reads. Paired-end (or maybe split?) reads will be created and I will
+test if Bowtie2 will make alignments with the reads in the file my script creates. Read coverage should
+be sufficient to allow variant discovery (so coverage should be high).
+What data will my program be using? Definitely needs to be able to take whole genome data,
+and smaller sizes if possible, though this is not the main goal.
+
+Keep this in mind:
+https://www.ecseq.com/support/ngs/why-do-the-reads-all-have-the-same-length-when-sequencing-differently-sized-fragments
+
+17/07/21:
+Made script that can create reads in a fastA file (make_reads_fastA.py). Need to add randomized quality scores
+and test whether the reads map correctly to the original file. If this is successful, rearrangements will
+be introduced and the test will be performed again.
+
+19/0/21:
+The script was adapted to create reads in the fastQ (.fq) format with randomized quality scores. Obviously when
+working with real sequence data the quality scores will simply be extracted from the sequence file. The randomized
+scores are only there for initial testing purposes.
+
+21/07/21:
+The tests were successful. The reads (test_fastq.fq) mapped correctly to the original sequence (lambda_virus.fa)
+using Bowtie2. Tests where 1 rearrangement was introduced (a deletion of 70bp) resulted in 2 reads (spanning the
+deletion) clearly not mapping, evident from the CIGAR string in the alignment file (SAM file). Additionally, 2
+70bp sequences were switched (reciprocal transposition) and again, the SAM alignment file clearly highlighted these
+areas as not mapping correctly. The first test mapped reads from the unchanged genome to one I had changed as
+described in this paragraph.
+A test will now be performed where reads are taken from the altered sequenced (lambda_virus_re.fa) and mapped
+onto the unaltered one (lambda_virus.fa).
+The test returned the same results; the 3 alterations are clearly visible in the alignment file.
+NB: SAMtools has documentation (bookmarked) has many useful options for arguments for returning specific
+alignments and reads. Read up on it again.
+
+Think about where to go now. Can a program use just this alignment to identify borders or (more likely)
+will a program: change the output, look more closely at the regions that did not map and try to re-align them,
+perhaps both? Many papers I have read describe ways of doing this (sort of...)
+Need a way to visualize the output, to make testing and tweaking much easier. Look into samtools or
+bcftools for this.
+
+22/07/21:
+    - IDEA:
+    - Align the reads to the full sequence in bowtie2 (room for tweaks in parameters and settings)
+    - Return areas where reads did not map (according to a confidence level or user-defined sensitivity)
+        - Can look at the CIGAR string, and the quality scores for example.
+    - Re-align these areas to the genome locally, perhaps making smaller reads or split-reads out of the
+        long reads.
+
+Basically: return the sections of the alignment that do not match and try to locally map them find borders
+of rearrangements. Very important to continue considering choices will be made regarding
+confidence values and statistics. Think about how to incorporate the quality scores from any sources
+of uncertainty.
+
+23/07/21:
