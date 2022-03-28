@@ -1,0 +1,64 @@
+27/03/22:
+	Have not worked on the project for a while. I was getting into the ML course as well 
+	as organizing my job. Now that I am back on track to work on this project 2 - 3 days 
+	per week, I need to recap where I left off. 
+	
+	RECAP: 
+	My BASH script does the following:
+	
+	1) My algorithm indexes 2 genomes using Bowtie2
+	
+	2) Reads of 2 different length are created (my Python script)
+		- Such that a specified coverage is achieved
+		- Currently 100bp and 200bp, and they are created from the same starting pos.
+			-Have tested different lengths, this is something to test further.
+		- Tested error rate with different coverages; 25x seems the minimum to 
+			avoid errors (though I must still do some math and stats on this).
+		- Reads are created from random positions (using randint)
+		
+	3) Reads from one genome are then mapped onto the other in single report mode (Bowtie2)
+		- This means that each read is mapped to only one place: the place it maps 
+			to the best. This gives me metrics to work with such as MAPQ, which is a 
+			measure of the probability of the read actually mapping there (check this).
+		- Alignemnt is saved as a SAM file.
+	
+	4) Reads are mapped again BUT in multi-report mode ("-k 2") (Bowtie2)
+		- Each read is mapped to its best AND second best position. 
+		- This mode does not record MAPQ in the same way and cannot be used to infer 
+			much about the quality of alignment.
+		- This mode is used in conjunction with the first in order to look for places 
+			where reads map to multiple places AND where in both cases the CIGAR 
+			string shows that the reads do not map completely. 
+		- Alignment is saved as a SAM file.
+	
+	5) SamTools is used to sort all the alignments in the SAM files
+	
+	6) My Python script finds the borders of rearrangement breakpoints
+		- Reads that did not map properly (according to CIGAR string) are added to a list
+			with their other attributes. 
+		- The reads then have their position (where the read started) adjusted according to 
+			the CIGAR string such that their positions are now the positions where they 
+			STARTED mapping (this is a simplification).
+		- The reads are then sorted into 2 groups: Those with a MAPQ above a certain 
+			threshold, and those with MAPQ below it (currently >40 but need to do the 
+			math). These groups are called "confident borders" and "nonconfident borders."
+		- The confident borders are placed into a list (of lists) and their positions are 
+			used to search for nonconfident borders that map to the same place (or within 
+			a certain allowed number of base pairs).
+		- In this way, the specific positions of breakpoints are found and all the reads
+			supporting this breakpoint are put together in a list.
+		- In the case of the multi-reported alignments, the MAPQ does not yield information 
+			about how well the read mapped, the values are more relative. Instead, these 
+			alignments are used to find "connected" borders: Borders that are in physically
+			adjacent in one of the genomes. 
+		The outputs are saved as .txt files.
+		
+	7) Further refinement will look at the cumulative probability (or some such property) and 
+		give each distinct border a score representing the statistical support for its 
+		existance. 
+		
+
+Misc. notes:
+	- Consider using genome A and genome B as names instead of genome 1 and 2 (feels more 
+		intuitive?).
+

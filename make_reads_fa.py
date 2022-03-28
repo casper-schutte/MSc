@@ -1,14 +1,16 @@
 from random import randint
 import sys
-# This python script successfully takes a fastA file and creates reads according to set parameters
-# these reads are written to a fastQ (.fq) file with the sequence name correlating numerically to the
-# order of the reads. Quality scores are randomized because the data is simulated for testing.
 
-#filepath = "ref_exp10_3.fa"
-#read_file_name = "reads_exp10_3.fa"
+# This python script successfully takes a fastA file and creates reads according to set parameters
+# these reads are written to a fastA (.fa) file with the sequence name correlating numerically to the
+# order of the reads.
+
+# filepath = "ref_exp10_3.fa"
+# read_file_name = "reads_exp10_3.fa"
 
 filepath = sys.argv[1]
 read_file_name = sys.argv[2]
+
 
 def get_seq(genome):
     """
@@ -43,7 +45,7 @@ def get_reads(seq_file):
     # 1x coverage here is defined as the sum of all the reads being equal to the length of the genome
     # 10x coverage indicates the sum of all the reads being 10x the length of the genome.
 
-    lor = []
+    # lor = []
     # List of reads
     # number_of_reads = (coverage * (len(seq_file)))/len(lor)
     reads = []
@@ -51,7 +53,7 @@ def get_reads(seq_file):
         start_pos = randint(0, len(seq_file) - read_len_2)
         reads.append(seq_file[start_pos:start_pos + read_len])
         reads.append(seq_file[start_pos:start_pos + read_len_2])
-
+    # Double-check the math here to make sure that the desired coverage is achieved
     print(len(reads))
     return reads
 

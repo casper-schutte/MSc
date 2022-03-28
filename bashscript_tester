@@ -1,0 +1,70 @@
+#!/bin/env bash
+echo
+echo " Please make sure that the genome FASTA files you wish to use start with 'ref_'"
+echo " and that the FASTA files containing the reads start with 'reads_'."
+echo " If you made a mistake during selection, please press 'Ctrl + c' to exit the program."
+echo
+#echo "Please select the first genome"
+#select file in $(ls ref*.fa)
+#do
+
+for i in {1..100}; do
+    genome1="ref_exp10_3.fa";
+    python3 make_reads_fa.py $genome1 reads_1.fa
+    echo "First genome: $genome1"
+    reads1=reads_1.fa
+    echo
+  #break;
+  #done
+
+
+  #echo "Please select the second gemome"
+  #select file in $(ls ref*.fa)
+  #do
+    genome2="ref_lv_mc.fa";
+    echo "Second genome: $genome2"
+    python3 make_reads_fa.py $genome2 reads_2.fa
+    reads2=reads_2.fa
+    echo
+  #break;
+  #done
+
+
+
+  bowtie2-build $genome1 $genome1
+  bowtie2-build $genome2 $genome2
+
+
+  single_report_align(){
+    bowtie2 --local -f -x $1 -U $2 -S $3.sam
+  }
+
+  single_report_align ${genome1} ${reads2} sa_1
+  single_report_align ${genome2} ${reads1} sa_2
+
+  multiple_report_align(){
+    bowtie2 --local -f -k 2 -x $1 -U $2 -S $3.sam
+  }
+
+  multiple_report_align ${genome1} ${reads2} ma_1
+  multiple_report_align ${genome2} ${reads1} ma_2
+
+  sort_sams(){
+    samtools sort $1 -O sam > $2
+
+  }
+
+
+  sort_sams sa_1.sam sa_1.sorted.sam
+  sort_sams sa_2.sam sa_2.sorted.sam
+  sort_sams ma_1.sam ma_1.sorted.sam
+  sort_sams ma_2.sam ma_2.sorted.sam
+
+  python3 find_borders_bash_test.py sa_1.sorted.sam sa1_20x.txt
+  python3 find_borders_bash_test.py sa_2.sorted.sam sa2_20x.txt
+  python3 find_borders_bash_test.py ma_1.sorted.sam ma1_20x.txt
+  python3 find_borders_bash_test.py ma_2.sorted.sam ma2_20x.txt
+
+done
+echo 
+echo "Done..."

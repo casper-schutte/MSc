@@ -14,7 +14,7 @@
         The same rearrangements will be tested 10 times (same as previous experiment)
         The Python script will be changed as described above.
 
-    Here is what the output looks like now:
+    Here is what the output looks like now:complete haplotype-resolved genome assemblies
 ma21.txt
 connected borders:
 [17, ('Chr1', 699, 'Chr1', 7141)]
@@ -114,3 +114,98 @@ most frequent number of hits per border being approximately 20.
 
     Once I automate the script to compile the results of multiple runs into a single document, testing will
     be much faster. I want to see how the average changes with more runs. Perhaps using single rearrangements.
+
+14/02/22:
+    Changed the python script "find_borders_bash_test.py" such that instead of writing over the old output file in
+        multiple runs, it appends the new borders to the end of the file.
+
+15/02/22:
+    100 runs: same conditions as usual
+    sa_1: 0 times out of 100 (with 5 borders detected)
+    sa_2: 10 times out of 100 (with 8 borders detected)
+    ma_1 and ma_2 caught all the borders, every time.
+
+
+    Changed the coverage to 30x (instead of 20x):
+    sa_1: 0 out of 100
+    sa_2: 2 out of 100
+    ma_1 (3 connected borders) and ma_2 (5 connected borders) caught all the borders, every time.
+
+
+These results indicate that the frequency of "missing" a breakpoint (having no reads that map with a
+MAPQ above the threshold) decreases as the coverage increases. I need to figure out what exactly is happening
+at the point where these reads are trying to map.
+The 2 borders that did not have reads that mapped above the threshold were both entirely made up of reads
+that started by not mapping and then started mapping (indicated by the '-' in the last field).
+Perhaps Bowtie2 gives reads that map in this way a lower score?
+TODO: Test different coverages against how many breakpoints are "missed" (1x, 5x, 10x, 20x, 30x, 40x, 50x)
+Will need to change the output such that it is even easier to interpret.
+
+16/02/22:
+    Will test the error rate using the coverages in the paragraph above. Will record which borders are missed,
+    although it seems to always be chr2 6511, and the other "-" border on chr3.
+
+    1x coverage:
+    All of the output files had more misses than hits, to the point where the results are difficult to interpret.
+
+During this week I contracted COVID-19 and was unable to work for quite a while. Data analysis will continue
+    when my health and mental state improves.
+
+28/02/22:
+    Continuation of data analysis:
+    For sa_1 and sa_2, the number of times a rearrangement breakpoint did NOT score above the threshold for
+    any of the reads containing it is recorded.
+    For ma_1 and ma_2, the number of times that a run missed at least 1 of the connected borders.
+    1x coverage:
+    All of the output files had more misses than hits, to the point where the results are difficult to interpret.
+
+    5X:
+    sa_1: 31 misses out of 100
+    sa_2: 84 misses
+    ma_1: 9
+    ma_2: 9
+
+     10X:
+    sa_1: 3
+    sa_2: 46
+    ma_1: 0 (zero) misses! Some of the connected borders only had 1 or 2 reads backing it up, but they were all there.
+    ma_2: 0
+
+     15X:
+    sa_1: 0
+    sa_2: 20
+    ma_1: 0 (zero) misses
+    ma_2: 0
+
+     20X:
+    sa_1: 0
+    sa_2: 5
+    ma_1: 0 (zero) misses
+    ma_2: 0
+
+     25X:
+    sa_1: 0
+    sa_2: 0
+    ma_1: 0
+    ma_2: 0
+
+     30X:
+    sa_1: 0
+    sa_2: 2
+    ma_1: 0
+    ma_2: 0
+
+     40X:
+    sa_1: 0
+    sa_2: 0
+    ma_1: 0
+    ma_2: 0
+
+These results support the idea that Bowtie2 struggles to map reads that do not map at the start
+    and gives them lower quality scores. In sa_1 there are no borders that are ONLY represented by
+    reads of this nature. Investigating reads in the SAM files themselves reveals that for reads
+    that do not map initially, the MAPQ very quickly declines with an increasing number of mismatched
+    reads at the beginning.
+    I will graph the coverage and the error rate for sa_2:
+    (5, 10, 15, 20, 25, 30, 40)
+    (84, 46, 20, 5, 0, 2, 0)
