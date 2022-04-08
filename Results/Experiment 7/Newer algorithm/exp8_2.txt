@@ -1,0 +1,22 @@
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string 
+Chr1 	 	 701 	 	 r706 	 	 44 	 187M13S 
+Chr1 	 	 701 	 	 r13 	 	 41 	 134M66S 
+Chr1 	 	 701 	 	 r32 	 	 44 	 19S181M 
+Chr1 	 	 701 	 	 r296 	 	 42 	 38S162M 
+Chr1 	 	 701 	 	 r305 	 	 44 	 23S177M 
+Chr1 	 	 701 	 	 r340 	 	 44 	 11S189M 
+Chr1 	 	 701 	 	 r522 	 	 36 	 126M74S 
+Chr1 	 	 701 	 	 r722 	 	 36 	 124M76S 
+Chr1 	 	 701 	 	 r515 	 	 36 	 117M83S 
+Chr1 	 	 701 	 	 r470 	 	 28 	 113M87S 
+Chr1 	 	 701 	 	 r311 	 	 28 	 87S113M 
+Chr1 	 	 701 	 	 r577 	 	 36 	 71S129M 
+Chr1 	 	 701 	 	 r587 	 	 24 	 106S94M 
+
+Chr2 	 	 421 	 	 r1087 	 	 44 	 26S174M 
+Chr2 	 	 421 	 	 r880 	 	 28 	 100S100M 
+Chr2 	 	 421 	 	 r1218 	 	 22 	 169S31M 
+Chr2 	 	 421 	 	 r1219 	 	 22 	 166S34M 
+Chr2 	 	 421 	 	 r1243 	 	 28 	 87S113M 
+Chr2 	 	 421 	 	 r1288 	 	 24 	 114S86M 
+

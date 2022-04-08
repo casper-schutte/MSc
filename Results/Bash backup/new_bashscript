@@ -1,0 +1,71 @@
+#!/bin/env bash
+echo
+echo " Please make sure that the genome FASTA files you wish to use start with 'ref_'"
+echo " and that the FASTA files containing the reads start with 'reads_'."
+echo " If you made a mistake during selection, please press 'Ctrl + c' to exit the program."
+echo
+echo "Please select the first genome"
+select file in $(ls ref*.fa)
+do
+	genome1=$file;
+	python make_reads_fa.py $genome1 reads_1
+	echo "First genome: $genome1"
+	echo
+break;
+done
+
+echo "Please select the reads assocaited with $genome1"
+select file in $(ls reads*.fa)
+do
+	reads1=$file;
+	echo "Reads associated with $genome1: $reads1";
+	echo
+break;
+done
+
+echo "Please select the second gemome"
+select file in $(ls ref*.fa)
+do
+	genome2=$file;
+	echo "Second genome: $genome2"
+	echo
+break;
+done
+
+echo "Please select the reads associated with $genome2"
+select file in $(ls reads*.fa)
+do
+	reads2=$file;
+	echo "Reads associated with $genome2: $reads2";
+	echo
+break;
+done
+
+
+bowtie2-build $genome1 $genome1
+bowtie2-build $genome2 $genome2
+
+
+single_report_align(){
+	bowtie2 --local -f -x $1 -U $2 -S $3.sam
+}
+
+single_report_align ${genome1} ${reads2} sa_1
+single_report_align ${genome2} ${reads1} sa_2
+
+multiple_report_align(){
+	bowtie2 --local -f -k 2 -x $1 -U $2 -S $3.sam
+}
+
+multiple_report_align ${genome1} ${reads2} ma_1
+multiple_report_align ${genome2} ${reads1} ma_2
+
+sort_sams(){
+	samtools sort $1 -O sam > ${1#.sam}.sorted.sam
+
+}
+
+sort_sams sa_1.sam
+sort_sams sa_2.sam
+sort_sams ma_1.sam
+sort_sams ma_2.sam

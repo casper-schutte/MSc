@@ -1,0 +1,17 @@
+Notes from Prof:
+    - Make a scoring scheme. For each read, see by how many bp it overhangs the reference.
+        (incorrect assignment). Derive a "map quality" score for each read in this way.
+        Think about the maths and come up with a coefficient or mapping score
+        for the alignment of the read to the reference.
+
+
+    - Think about choosing examiners (thinking about internal examiners).
+
+    - Think about testing different alignment algorithms with the bash script
+
+
+
+08/04/2022:
+    - Cleaning up the git repo.
+    - Moving away from testing the algorithm 100s of times with the bash script, will now try to clean up the
+        outputs and take the data further by adding a scoring system.

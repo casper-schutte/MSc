@@ -1,0 +1,29 @@
+chromosome 	 position 	 read name 	 MAPQ 	 CIGAR string 
+Chr1 	 	 911 	 	 r539 	 	 41 	 23S77M 
+Chr1 	 	 911 	 	 r740 	 	 41 	 22S78M 
+Chr1 	 	 911 	 	 r1057 	 	 44 	 4S96M 
+Chr1 	 	 911 	 	 r1197 	 	 41 	 24S76M 
+Chr1 	 	 911 	 	 r1314 	 	 42 	 17S83M 
+Chr1 	 	 911 	 	 r1060 	 	 9 	 45S55M 
+
+Chr2 	 	 421 	 	 r2301 	 	 44 	 14S86M 
+Chr2 	 	 421 	 	 r1509 	 	 22 	 66S34M 
+Chr2 	 	 421 	 	 r2782 	 	 22 	 67S33M 
+
+Chr4 	 	 1 	 	 r4338 	 	 44 	 14S86M 
+Chr4 	 	 1 	 	 r4348 	 	 44 	 11S89M 
+Chr4 	 	 1 	 	 r4767 	 	 41 	 24S76M 
+Chr4 	 	 1 	 	 r4771 	 	 44 	 5S95M 
+Chr4 	 	 1 	 	 r4817 	 	 42 	 21S79M 
+Chr4 	 	 1 	 	 r3768 	 	 25 	 31S69M 
+Chr4 	 	 1 	 	 r4408 	 	 18 	 36S64M 
+Chr4 	 	 1 	 	 r4715 	 	 9 	 45S55M 
+
+Chr4 	 	 10773 	 	 r4804 	 	 25 	 69M31S 
+
+Chr4 	 	 10773 	 	 r3878 	 	 21 	 66M34S 
+
+Chr4 	 	 10773 	 	 r4064 	 	 16 	 62M38S 
+
+Chr4 	 	 10773 	 	 r4077 	 	 22 	 33M67S 
+

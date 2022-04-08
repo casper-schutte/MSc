@@ -1,0 +1,116 @@
+
+03/02/22:
+    Thoughts: My main folder is very messy. It is time to start tidying it up and running everything
+        from the actual main folder.
+
+    The repeat test (exp10.4) showed that in every case the borders were identified. The average occurrence of a
+        connected border was 17.65. This is close to the coverage. I will now change the Python script such that
+        instead of listing every occurrence of a breakpoint, it lists the first one in the list along with the
+        occurrence of the border. This is not the same as some of the borders are not connected. This should make the
+        results easier to understand.
+
+    Experiment 10.5:
+    Rearrangements:
+        The same rearrangements will be tested 10 times (same as previous experiment)
+        The Python script will be changed as described above.
+
+    Here is what the output looks like now:
+ma21.txt
+connected borders:
+[17, ('Chr1', 699, 'Chr1', 7141)]
+
+[16, ('Chr1', 701, 'Chr1', 1051)]
+
+[15, ('Chr1', 1052, 'Chr1', 7141)]
+
+[22, ('Chr2', 5741, 'Chr2', 6511)]
+
+[16, ('Chr3', 1, 'Chr3', 281)]
+
+
+38 ['Chr1', 701, 'r2880', 255, '174M26S', '+']
+45 ['Chr1', 1052, 'r2600', 255, '196M4S', '+']
+37 ['Chr1', 7141, 'r1067', 255, '88M12S', '+']
+30 ['Chr2', 5741, 'r4728', 255, '199M1S', '+']
+31 ['Chr2', 6511, 'r3014', 255, '112S88M', '-']
+21 ['Chr3', 1, 'r6174', 255, '157S43M', '-']
+22 ['Chr3', 281, 'r6618', 255, '195M5S', '+']
+22 ['Chr4', 10221, 'r7620', 255, '191M9S', '+']
+
+It is much easier to interpret the results. We can already see that there are usually more rearrangement  borders
+    than connected ones. This is expected as not all the reads that contain borders are found to be connected.
+In this case, there was ample support for all the breakpoints, exceeding the coverage (20x) on all counts.
+This script will be tested again 10 times to test the consistency with the last experiment and now also observing
+    the total counts of reads containing rearrangements breakpoints.
+
+Side thought: Take the a much larger test genome and run it through the algorithm to see if the size scaling will
+    be at all manageable. The ref genome is approx 50kb, the sorted SAM files are 3.8mb. This might be a problem.
+
+Results exp10_5:
+    I will not add the all of the results here. Instead, I will summarize them. They are in an appropriately named
+    folder under "Results." Included in the folder is a text document containing all the results put together.
+
+    For all the results for single alignment tests, the results looked as follows:
+
+25 ['Chr1', 701, 'r174', 44, '199M1S', '+']
+32 ['Chr1', 1052, 'r2436', 44, '178M22S', '+']
+34 ['Chr1', 7141, 'r180', 44, '191M9S', '+']
+17 ['Chr2', 5741, 'r4816', 44, '193M7S', '+']
+14 ['Chr2', 6511, 'r3361', 41, '26S74M', '-']
+20 ['Chr3', 1, 'r5851', 44, '6S94M', '-']
+19 ['Chr3', 281, 'r6280', 44, '188M12S', '+']
+23 ['Chr4', 10221, 'r8474', 44, '195M5S', '+']
+
+Where the number before the example read indicates the number of reads that map to the same position.
+As previously discussed, the algorithm creates these results by first going through the list of reads
+containing breakpoints and taking the reads with a MAPQ score above a certain value and appending them to
+a list. The reads that scored below the threshold are appended to this list into a sublist containing the
+high-scoring read that mapped to the same position.
+The problem: If there are no high-scoring reads for a known breakpoint, there is no list to append the lower-scoring
+reads. This occurred once in the 20 times this specific test was run.
+The result follows:
+
+31 ['Chr1', 701, 'r376', 44, '190M10S', '+']
+31 ['Chr1', 1052, 'r676', 44, '190M10S', '+']
+25 ['Chr1', 7141, 'r2452', 44, '191M9S', '+']
+24 ['Chr2', 5741, 'r2942', 44, '189M11S', '+']
+11 ['Chr3', 1, 'r5977', 44, '12S88M', '-']
+21 ['Chr3', 281, 'r7408', 44, '193M7S', '+']
+10 ['Chr4', 10221, 'r7694', 44, '193M7S', '+']
+1 ['Chr2', 6511, 'r3054', 25, '56S144M', '-']
+1 ['Chr2', 6511, 'r3516', 25, '51S149M', '-']
+1 ['Chr2', 6511, 'r4002', 9, '91S109M', '-']
+1 ['Chr2', 6511, 'r4406', 18, '74S126M', '-']
+1 ['Chr2', 6511, 'r4506', 21, '65S135M', '-']
+1 ['Chr2', 6511, 'r4554', 9, '91S109M', '-']
+1 ['Chr2', 6511, 'r4572', 2, '98S102M', '-']
+1 ['Chr2', 6511, 'r4586', 17, '80S120M', '-']
+1 ['Chr2', 6511, 'r4631', 21, '34S66M', '-']
+1 ['Chr2', 6511, 'r4632', 38, '34S166M', '-']
+1 ['Chr2', 6511, 'r4683', 21, '35S65M', '-']
+1 ['Chr2', 6511, 'r4684', 38, '35S165M', '-']
+1 ['Chr2', 6511, 'r5677', 9, '43S57M', '-']
+1 ['Chr2', 6511, 'r5678', 37, '43S157M', '-']
+
+This is a problem. The rearrangement is as "valid" as the others. It was a deletion from the middle of
+chromosome 2. Since this alignment took reads from the rearranged genome and mapped them onto the unchanged
+genome (denoted as "sa2" by my own convention), only reads do not map at their first X amount of bases and then
+started mapping indicate this border. This is denoted by the "-" sign at the end of the read. This is bound to happen
+SOME of the time given that the reads are created at random starting positions. The question is how often will a
+breakpoint not have at least 1 high-scoring read to back it up?
+
+Still need to look at the distribution of hits for the borders. I expect to see a Gaussian distribution with the
+most frequent number of hits per border being approximately 20.
+
+10/02/22:
+    I will analyse the distribution of the frequency at which borders are detected by high-scoring reads.
+    For now, I will put the values into Excel to analyse them easier.
+    I will also further automate the testing process such that I do not have copy and paste the results 40 times.
+
+    For the analysis, see "Data_analysis.ods" in the results folder.
+    For the sa_x1 results, the average number of hits across all breakpoints was 33.16. The rearrangement border on
+    chr2 had 50 hits on average, likely due to the fact that reads from 2 different places on the other chromosome map
+    somewhere around there because it is a deletion breakpoint.
+
+    Once I automate the script to compile the results of multiple runs into a single document, testing will
+    be much faster. I want to see how the average changes with more runs. Perhaps using single rearrangements.

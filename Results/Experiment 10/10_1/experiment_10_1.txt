@@ -1,0 +1,7 @@
+Rearrangments:
+
+	1) First 280 bp (4 lines) duplicated from chr1 to end of chr1
+
+	2) 700 bp deleted from chr2, starting at position 700
+
+	3 Translocated the first 210bp from chr3 to the middle of the chromosome
