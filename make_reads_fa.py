@@ -12,6 +12,7 @@ filepath = sys.argv[1]
 read_file_name = sys.argv[2]
 
 
+
 def get_seq(genome):
     """
     Takes a fastA file and returns the full sequence sans the title and newline characters

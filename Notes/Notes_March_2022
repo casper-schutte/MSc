@@ -61,4 +61,7 @@
 Misc. notes:
 	- Consider using genome A and genome B as names instead of genome 1 and 2 (feels more 
 		intuitive?).
+	- Need to test other cases where alignment might be challenging, such as adding repetitive 
+		areas or other realistic elements that might break my algorithm.
+		
 
