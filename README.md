@@ -2,25 +2,14 @@
 Designing a statistically rigorous Burrows-Wheeler mapping algorithm to find rearrangement breakpoints
 
 # Usage:
-At this time, the use of this algorithm requires that the bioinformatics tool, Bowtie2, be installed. Using this script,
-one can take two genomes of very closely related species and calculate where the borders of rearrangements are. 
+At this time, the use of this algorithm requires that the bioinformatics tools Bowtie2 and SamTools to be installed.
+The bash script calls all the necessary scripts and tools to run the algorithm. This algorithm is still in development. 
 
-
-
-The script "make_reads.py" is used to construct reads from genomes in the FastA format. 
-Bowtie2 is then used to align reads from one genome to the other (by indexing the other genome and performing an 
-alignment)
-
-Example:
-
-Used make_reads.py to construct reads from one of the genomes (reads.fa)
-
-/$ Bowtie2-build path/to/index.fa index_name
-
-/$ Bowtie2 --local -f -x index_name -U path/to/reads.fa -S alignment_name.sam 
-
-Then find_borders.py (which is dependent on the class_SAM.py module) can be used to view the continuous 
-blocks and the borders between them, with information (position on chromosome, chromosome name, 
-read name, mapping score). 
-
-This algorithm is not complete, but is being updated, it may not work as intended in its current form.
+In the current version, the algorithm first creates reads from the 2 selected genomes (A and B). This is done by a 
+Python script where one can adjust the coverage and read lengths. Bowtie2 is then called to index the genomes and 
+map reads from genome A onto reference genome B and vice versa. This mapping process is completed twice, once 
+with Bowtie2's single-reporting mode and once in multi-report mode. This allows us the get an accurate measure of 
+the mapping quality as well as information about which breakpoints are in physical proximity. The outputs are saved as 
+SAM files. SamTools is then called to sort the SAM files. Finally, another Python script is called to look for reads 
+that do map over their full length, but have a mapping quality above a certain threshold. These reads are used as places 
+to start looking for borders. The Python script outputs a text file containing the reads that support the breakpoints. 
