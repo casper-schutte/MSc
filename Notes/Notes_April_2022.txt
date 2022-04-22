@@ -15,3 +15,31 @@ Notes from Prof:
     - Cleaning up the git repo.
     - Moving away from testing the algorithm 100s of times with the bash script, will now try to clean up the
         outputs and take the data further by adding a scoring system.
+
+
+22/04/22:
+    - Have been thinking about aspects of the project, reading about the details of MAPQ and how it is calculated.
+        - I can't simply use the sum of MAPQ values as a score, as it is not a linear function (logarithmic).
+        - I need to learn more about the scores to figure out to what degree I can rely on them.
+
+    - I need to change my script such that all the borders are returned, and keep the current version for testing.
+
+    - Need to change the output and think about a way in which I can automate the testing.
+
+
+What is a MAPQ score?: MAPing Quality
+    - Definition: MAPQ = -10log(Pr{mapping position is wrong})
+        - as defined in the SAM format documentation.
+        - Thus, if you knew that the prob for a given read mapping correctly is 0.99,
+            the MAPQ score would be 20. If the prob was 0.999, the MAPQ score would be 30.
+            This means that there is no upper bound on MAPQ scores! It also means I should rethink
+            my current MAPQ threshold, since a MAPQ of 40 means a prob of 0.9999 of mapping correctly.
+        - This means that my results where some borders were not found should perhaps be repeated
+            with a lower MAPQ threshold.
+        - Another crucial point to consider, especially if I plan to repeat experiments with other
+            BW-aligners, is that MAPQs cannot be directly compared between different software.
+
+    IDEA: screw the cumulative score, if a read has a MAPQ of >40, its probability of mapping to that position is
+        over 0.999! (non-factorial exclamation). Such a score would only need to come into play if there was
+        uncertainty in the mapping position. Do not disregard this idea completely, it could be useful if I run
+        into problems where duplications and repetitive regions throw a spanner in the works.
