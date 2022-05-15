@@ -5,7 +5,7 @@ from itertools import groupby
 import sys
 
 file = SAM()
-#filepath = 'ma_2.sam.sorted.sam'
+# filepath = 'ma_2.sam.sorted.sam'
 filepath = sys.argv[1]
 outname = sys.argv[2]
 number = file.ReadSAMFile(filepath)
@@ -48,10 +48,13 @@ def get_border_reads():
 
 
 def get_borders(borders):
-    # This function takes the reads which are suspected to contain rearrangement breakpoints and extracts the CIGAR
-    # strings. Then, the reads are returned BUT with ADJUSTED positions. These positions refer to the last (or first)
-    # mapping read, depending on whether it matched initially or started matching somewhere along its length.
-
+    """
+    This function takes the reads which are suspected to contain rearrangement breakpoints and extracts the CIGAR
+    strings. Then, the reads are returned BUT with ADJUSTED positions. These positions refer to the last (or first)
+    mapping read, depending on whether it matched initially or started matching somewhere along its length.
+    :param borders:
+    :return breakpoints:
+    """
     bps = []
     for border in borders:
         cigar_str = border[4]
@@ -75,13 +78,13 @@ def get_borders(borders):
 
     breakpoints = []
     for m in enumerate(matching):
-        if m[1].count("-") == 0:
+        if m[1].count("-") == 0 and int(m[1]) > 0:
             breakpoints.append([
                 borders[m[0]][0], borders[m[0]][1] + int(m[1]), borders[m[0]][2], borders[m[0]][3], borders[m[0]][4],
                 "+"
             ])
             # The "+ int(m[1])" shifts the position to the breakpoint instead of where the read starts.
-            # For the reads that do match at the start (below), the position already refers to where the potential
+            # For the reads that do match at the start (below), the position already refers to the potential
             # breakpoints.
         else:
             breakpoints.append([
@@ -92,13 +95,6 @@ def get_borders(borders):
 
 
 def refine_breakpoints(bp):
-    pos = []
-
-    mapqs = []
-    for read in bp:
-        mapqs.append(read[3])
-        pos.append(read[1])
-
     conf_borders = []
     nonconf_borders = []
 
@@ -160,14 +156,14 @@ def write_to_file(breakpoints, duplicated_reads):
             my_file.write(f"{dup}  \n")
             my_file.write("\n")
             
-    #my_file.write(f"chromosome \t position \t read name \t MAPQ \t CIGAR string \n")
+    my_file.write(f"chromosome \t position \t read name \t MAPQ \t CIGAR string \n")
     my_file.write(f"\n")
     for area in breakpoints:
-        my_file.write(f"{str(len(area))} ")
-        #my_file.write("\n")
-        my_file.write(f"{area[0]}")
-        #for bp in area:
-            #my_file.write(f"{bp[0]} \t \t {bp[1]} \t \t {bp[2]} \t \t {bp[3]} \t {bp[4]} \n")
+        my_file.write(f"Read count: {str(len(area))} ")
+        my_file.write("\n")
+        # my_file.write(f"{area[0]}")
+        for bp in area:
+            my_file.write(f"{bp[0]} \t \t {bp[1]} \t \t {bp[2]} \t \t {bp[3]} \t {bp[4]} \n")
 
         my_file.write("\n")
     
@@ -192,8 +188,9 @@ def find_duplicate_reads(breakpoints):
 
     connected_borders = []
     for border in grouped_borders:
-        connected_borders.append([border[0][0], border[0][1],
-                                  border[1][0], border[1][1]])
+        if border[0][0] != border[1][0] or border[0][1] != border[1][1]:
+            connected_borders.append([border[0][0], border[0][1],
+                                      border[1][0], border[1][1]])
 
     print(connected_borders)
     my_set = [tuple(x) for x in connected_borders]

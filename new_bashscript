@@ -8,7 +8,7 @@ echo "Please select the first genome (Genome A)"
 select file in $(ls ref*.fa)
 do
 	genomeA=$file;
-	python3 make_reads_fa.py $genomeA readsA.fa
+	python3 make_reads_fa.py "$genomeA" readsA.fa
 	echo "First genome: $genomeA"
 	readsA=readsA.fa
 	echo
@@ -21,7 +21,7 @@ select file in $(ls ref*.fa)
 do
 	genomeB=$file;
 	echo "Second genome: $genomeB"
-	python3 make_reads_fa.py $genomeB readsB.fa
+	python3 make_reads_fa.py "$genomeB" readsB.fa
 	readsB=readsB.fa
 	echo
 break;
@@ -29,26 +29,27 @@ done
 
 
 
-bowtie2-build $genomeA $genomeA
-bowtie2-build $genomeB $genomeB
+bowtie2-build "$genomeA" "$genomeA"
+bowtie2-build "$genomeB" "$genomeB"
 
 
 single_report_align(){
 	bowtie2 --local -f -x $1 -U $2 -S $3.sam
 }
 
-single_report_align ${genomeA} ${readsB} SBA
-single_report_align ${genomeB} ${readsA} SAB
+single_report_align "${genomeA}" ${readsB} SBA
+single_report_align "${genomeB}" ${readsA} SAB
 
 multiple_report_align(){
 	bowtie2 --local -f -k 2 -x $1 -U $2 -S $3.sam
 }
 
-multiple_report_align ${genomeA} ${readsB} MBA
+multiple_report_align "${genomeA}" ${readsB} MBA
+# shellcheck disable=SC2086
 multiple_report_align ${genomeB} ${readsA} MAB
 
 sort_sams(){
-	samtools sort $1 -O sam > $2
+	samtools sort "$1" -O sam > $2
 
 }
 
