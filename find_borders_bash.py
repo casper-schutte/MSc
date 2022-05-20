@@ -9,6 +9,7 @@ file = SAM()
 filepath = sys.argv[1]
 outname = sys.argv[2]
 number = file.ReadSAMFile(filepath)
+mode = sys.argv[3]
 
 """
 It is VITAL that the variable "read_len" is set to be the same as in the script used to create the reads
@@ -148,24 +149,25 @@ def write_to_file(breakpoints, duplicated_reads):
     # output file, along with their occurrence.
 
     my_file = open(file_name, "w")
-    if duplicated_reads is None:
-        pass
-    else:
-        my_file.write(f"connected borders: \n")
+    if mode == "M":
+        # my_file.write(f"connected borders: \n")
         for dup in duplicated_reads:
-            my_file.write(f"{dup}  \n")
-            my_file.write("\n")
-            
-    my_file.write(f"chromosome \t position \t read name \t MAPQ \t CIGAR string \n")
-    my_file.write(f"\n")
-    for area in breakpoints:
-        my_file.write(f"Read count: {str(len(area))} ")
-        my_file.write("\n")
-        # my_file.write(f"{area[0]}")
-        for bp in area:
-            my_file.write(f"{bp[0]} \t \t {bp[1]} \t \t {bp[2]} \t \t {bp[3]} \t {bp[4]} \n")
+            my_file.write(f"{dup[0]}\t{dup[1]}\n")
+            # my_file.write("\n")
+    elif mode == "S":
+        # my_file.write(f"chromosome \t position \t read name \t MAPQ \t CIGAR string \n")
+        # my_file.write(f"\n")
+        for area in breakpoints:
+            threshold_len = 2
+            if len(area) > threshold_len:
+                my_file.write(">")
+                # my_file.write(f"Read count: {str(len(area))} ")
+                my_file.write("\n")
+                # my_file.write(f"{area[0]}")
+                for bp in area:
+                    my_file.write(f"{bp[0]}\t{bp[1]}\t{bp[2]}\t{bp[3]}\t{bp[4]}\n")
 
-        my_file.write("\n")
+        # my_file.write("\n")
     
     my_file.close()
 
@@ -182,7 +184,7 @@ def find_duplicate_reads(breakpoints):
             duplicates.append(flat_borders[name[0]])
     duplicates.sort(key=lambda x: x[2])
     print(f"duplicates: {duplicates}")
-    # This sorcery checks for reads mapping to more than one place
+    # The sorcery below checks for reads mapping to more than one place
     grouped_borders = [list(x) for y, x in groupby(duplicates, lambda x: x[2])]
     print(grouped_borders)
 
@@ -195,13 +197,13 @@ def find_duplicate_reads(breakpoints):
     print(connected_borders)
     my_set = [tuple(x) for x in connected_borders]
     my_set = set(my_set)
-    print(my_set)
+    # print(my_set)
     my_list = []
     for connection in my_set:
         my_list.append([connected_borders.count(list(connection)),
                         connection])
 
-    print(my_list)
+    # print(my_list)
     if not grouped_borders:
         return None
     else:

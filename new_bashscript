@@ -1,4 +1,6 @@
 #!/bin/env bash
+
+# shellcheck disable=SC2086
 echo
 echo " Please make sure that the genome FASTA files you wish to use start with 'ref_'"
 echo " and that the FASTA files containing the reads start with 'reads_'."
@@ -45,7 +47,7 @@ multiple_report_align(){
 }
 
 multiple_report_align "${genomeA}" ${readsB} MBA
-# shellcheck disable=SC2086
+
 multiple_report_align ${genomeB} ${readsA} MAB
 
 sort_sams(){
@@ -58,10 +60,10 @@ sort_sams SAB.sam SAB.sorted.sam
 sort_sams MBA.sam MBA.sorted.sam
 sort_sams MAB.sam MAB.sorted.sam
 
-python3 find_borders_bash.py SBA.sorted.sam sBA.txt
-python3 find_borders_bash.py SAB.sorted.sam sAB.txt
-python3 find_borders_bash.py MBA.sorted.sam mBA.txt
-python3 find_borders_bash.py MAB.sorted.sam mAB.txt
+python3 find_borders_bash.py SBA.sorted.sam sBA.txt S
+python3 find_borders_bash.py SAB.sorted.sam sAB.txt S
+python3 find_borders_bash.py MBA.sorted.sam mBA.txt M
+python3 find_borders_bash.py MAB.sorted.sam mAB.txt M
 
 echo 
 echo "Done..."
