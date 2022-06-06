@@ -109,7 +109,7 @@ def refine_breakpoints(bp):
             nonconf_borders.append(read)
 
     border_areas = []
-    allowance = 10
+    allowance = 20
     # Think about letting allowance change to be inversely proportional to the MAPQ score.
     counter = 0
     # counter to keep track of where we are in the list
@@ -138,7 +138,7 @@ def refine_breakpoints(bp):
             border_areas.append([border])
 
     # print(border_areas)
-    print(len(border_areas[0]) + len(border_areas[1]))
+    # print(len(border_areas[0]) + len(border_areas[1]))
 
     return border_areas
 
@@ -158,9 +158,14 @@ def write_to_file(breakpoints, duplicated_reads):
         # my_file.write(f"chromosome \t position \t read name \t MAPQ \t CIGAR string \n")
         # my_file.write(f"\n")
         for area in breakpoints:
+            diff = 0
+            positions = []
+            for i in area:
+                positions.append(int(i[2].split("r")[1]))
+            diff = max(positions) - min(positions)
             threshold_len = 2
             if len(area) > threshold_len:
-                my_file.write(">")
+                my_file.write(f">{diff}")
                 # my_file.write(f"Read count: {str(len(area))} ")
                 my_file.write("\n")
                 # my_file.write(f"{area[0]}")
@@ -173,20 +178,17 @@ def write_to_file(breakpoints, duplicated_reads):
 
 
 def find_duplicate_reads(breakpoints):
-    for border in breakpoints:
-        print(border)
     flat_borders = [border for x in breakpoints for border in x]
     read_names = [x[2] for x in flat_borders]
     duplicates = []
-    print(read_names)
     for name in enumerate(read_names):
         if read_names.count(name[1]) > 1:
             duplicates.append(flat_borders[name[0]])
     duplicates.sort(key=lambda x: x[2])
-    print(f"duplicates: {duplicates}")
+    # print(f"duplicates: {duplicates}")
     # The sorcery below checks for reads mapping to more than one place
     grouped_borders = [list(x) for y, x in groupby(duplicates, lambda x: x[2])]
-    print(grouped_borders)
+    # print(grouped_borders)
 
     connected_borders = []
     for border in grouped_borders:
@@ -194,7 +196,7 @@ def find_duplicate_reads(breakpoints):
             connected_borders.append([border[0][0], border[0][1],
                                       border[1][0], border[1][1]])
 
-    print(connected_borders)
+    # print(connected_borders)
     my_set = [tuple(x) for x in connected_borders]
     my_set = set(my_set)
     # print(my_set)

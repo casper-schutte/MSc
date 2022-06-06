@@ -43,3 +43,47 @@ What is a MAPQ score?: MAPing Quality
         over 0.999! (non-factorial exclamation). Such a score would only need to come into play if there was
         uncertainty in the mapping position. Do not disregard this idea completely, it could be useful if I run
         into problems where duplications and repetitive regions throw a spanner in the works.
+
+
+23/04/22:
+    - Need to find a way to represent the uncertainty surrounding the exact positions of the breakpoints.
+        - There is often disagreement between the reads that mapped initially and those that did not.
+        - There might be a way to find the "true" or most certain of the two. The reads that did NOT map initially
+            are probably the most certain ones. Think about this.
+
+    - Think about the final output we want to return.
+        - We want to know the positions of the borders between rearranged blocks.
+        - We don't want to return SNPs though. This means I will have to add some sort of length-of-mismatch
+            check in my code when it is looking at the CIGAR string. There is already code that extracts the
+            CIGAR string to adjust the positions to reflect where the breakpoint is. I could ignore the reads
+            where the CIGAR string shows a mismatch of only a few bp. This would eliminate the problem of SNPs and
+            it shouldn't affect the assignment of legitimate borders.
+
+        - I can introduce a single SNP somewhere in the test genome. It should show up as a "border" with the
+            current script. I can then add a check in the script that omits reads with too many matches
+            Pseudocode:
+            if len(read) == 100 and (i)M > 95 or len(read) == 200 and (i)M > 195:
+                pass
+            else:
+                keep read
+
+            But make it work with any read length. Could use (i)M > len(read) - 5
+            or some arbitrary threshold I decide on.
+
+
+    Experiment 11: excluding SNPs.
+        - Will first introduce an SNP into the rearranged genome.
+            - NB: changing name of rearranged genome to ref_exp11.fa
+        - SNP at pos 210 on Chr 2: C -> A
+
+        - Running the pipeline as normal
+            - Out of 3 tests, the SNP was found all 3 times. Once with 4 reads, twice with 2. All the reads had
+                MAPQ scores of 44 (perfect score). All the reads had less than 5 bp soft-clipped. It seems that
+                for reads where the SNP was in the middle were not mapped to the position. Possibly because of the
+                sensitivity of the local alignment. This is good, it automatically removes some edge cases that
+                I would have had to worry about.
+            - The SNP will stay in the genome so that I can verify that it does not appear in further tests.
+            - Will now attempt to remove it.
+
+
+

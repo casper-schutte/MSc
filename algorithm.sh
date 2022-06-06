@@ -7,7 +7,7 @@ echo " and that the FASTA files containing the reads start with 'reads_'."
 echo " If you made a mistake during selection, please press 'Ctrl + c' to exit the program."
 echo
 echo "Please select the first genome (Genome A)"
-select file in $(ls ref*.fa)
+select file in $(ls ref*.fasta)
 do
 	genomeA=$file;
 	python3 make_reads_fa.py "$genomeA" readsA.fa
@@ -19,7 +19,7 @@ done
 
 
 echo "Please select the second genome (Genome B)"
-select file in $(ls ref*.fa)
+select file in $(ls ref*.fasta)
 do
 	genomeB=$file;
 	echo "Second genome: $genomeB"

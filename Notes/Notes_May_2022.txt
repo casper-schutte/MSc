@@ -1,0 +1,112 @@
+
+06/05/22:
+    - Will spend time today planning on my next steps:
+        1) Finish code to exclude SNPs from being classed as borders. There needs to be a minimum size threshold,
+            Prof recommended a fairly high threshold. Remember that the test data we are using right now is SMALL.
+        2) Start gathering some of my insights together, from the notes and stuff. Don't want to miss important
+            thoughts I had and wrote down.
+        3) Don't like the idea of testing with a different mapping algorithm, Bowtie2 gives good control, and this
+            is a proof of concept (sort of, in a way). After we are done maybe we can try that.
+        4) MOST IMPORTANT, start getting ready to test on real data. This will show if my program actually does
+            anything special or not. Remember the problem that you are trying to solve.
+        5) BONUS idea: find a way to display the results of the 4 alignments together in a way that is easy to
+            understand. Or better yet, do some post-processing (change the format of the output, obviously).
+            Who says I can't take those .txt files and feed them into another algorithm to gain deeper insight into
+            the nature of the rearrangements?
+
+
+    Thoughts on Idea 1):
+        - NB to figure out what breakpoints we are interested in. If we don't care about an e.g. 400bp insert,
+            the algorithm shouldn't be worried about checking the mismatches in the CIGAR score. Perhaps this where
+            connected borders can help us. The problem is that they only show up for certain kinds of rearrangements.
+            Another idea: Yes, the reads are created randomly, and this killed my idea of using their order to figure
+            out extra information about the breakpoints. However, nothing is stopping me from sorting the reads after
+            creation (by position), and changing the name to reflect this order. This might be valuable, as then I can
+            simply look at the read names and figure out where a read came from.
+
+            BONUS idea: apply our newfound knowledge of nodes and edges to represent the rearrangements
+            as a walk through the original genome. This is just another way of saying figure out the order of
+            rearranged blocks in one genome relative to another.
+
+
+14/05/2022:
+    - Had another idea: After creating the reads, sort them and THEN rename them in order. This can help me
+        identify connected borders and might help to elucidate the movements of synteny blocks. This will be done
+        first. Will use the bash script. Need to also decide if the 2 different read lengths actually matter. The
+        real genomes will be so much bigger that I think it won't make any difference.
+
+    - Attempted to change make_reads_fa.py such that only 1 read length is used. Appears successful.
+    - Attempted to change make_reads.py such that the reads are named in order, this did not work. Just think about
+        it and write the script from scratch. Why are we using random positions again?
+
+    - UPDATE: managed to change the script such that the read names now correlate roughly with their original
+        position in the genome. This will be useful as extra information confirming the occurrence of rearrangements.
+        I need to verify that the positions are correct, I could also just change it such that they are named purely
+        numerically in order, instead of representing the original position in the genome.
+
+20/05/22:
+    - I want to write a script that takes the .txt outputs as input. I think this is a better idea than introducing
+        more and more complexity to the way borders are reported in the original output. A post-processing step would
+        allow me to check for length of rearrangement, connected borders, etc. For this to work I need to change the
+        output. We can trade human readability for computational ease. I can for example start each group of reads
+        representing a potential border as:
+        >
+        read_1
+        read_2
+        read_3
+        >
+        read_4
+        read_5
+        etc.
+
+        Then I can perhaps split by ">".
+        Or, what about writing it out as a .tsv?
+
+    - Changed the script such that the output looks like:
+        >
+        Chr1 	 	 701 	 	 r503 	 	 44 	 197M3S
+        Chr1 	 	 701 	 	 r511 	 	 44 	 189M11S
+        Chr1 	 	 701 	 	 r526 	 	 44 	 174M26S
+        Chr1 	 	 699 	 	 r6760 	 	 44 	 28S172M
+        Chr1 	 	 699 	 	 r6765 	 	 44 	 23S177M
+        Chr1 	 	 699 	 	 r6773 	 	 44 	 15S185M
+        etc
+        >
+        Chr1 	 	 1052 	 	 r6951 	 	 44 	 190M10S
+        Chr1 	 	 1052 	 	 r6966 	 	 44 	 175M25S
+        Chr1 	 	 1052 	 	 r6966 	 	 44 	 175M25S
+        Chr1 	 	 1051 	 	 r691 	 	 44 	 9S191M
+
+        With no more lines for humans. The connected borders (mAB and mBA) are just printed as is, no longer in a list.
+
+    - The Python script now takes a 3rd argument, S or M, which is supplied in the bash script. This flag tells the
+        python script the format of the output. The script now has a threshold for the number of reads supporting a
+        border. It is currently set to 1 but this can be changed to be defined by the user.
+
+    - Started a script for post-processing: analyse_borders.py.
+
+21/05/22:
+    - I need to think about how I want to return the information. Obviously the first step would be to look at the
+        connected borders and point to the grouped borders to say "these two were connected". We can also look at the
+        reciprocal rearrangements to see if any extra information can be found.
+
+        Need to draw the rearrangements to help me visualize the results.
+    - I can manipulate the output with the new python script, but I still need to decide how I am going to use it.
+
+23/05/22:
+    - I have decided I want to create an output that shows all the information from the other outputs. I want to show
+        genomes A and B, and their connected borders. I think I will let each genome's borders remain consistent with
+        their own reference positions.
+    - The script now takes all 4 output files from find_borders_bash.py (sAB.txt, sBA.txt, mAB.txt, and mBA.txt) and
+        performs further analysis. I introduced a method where the read names are extracted (they correlate with the
+        starting position of the read) and the maximum and minimum values are subtracted and the length is checked. I
+        think this will be used to introduce a minimum length check.
+
+28/05/22:
+    - The plan for the next 2 days is as follows:
+        1) Test and verify the length check threshold, some work may need to be done with read construction. It might
+            not be easy to verify the size of rearrangements. For example, it might exclude rearrangements where the
+            borders are close to other rearrangements. Although, we are mainly interested in large rearrangements.
+        2) Increase the size of the genome we are testing on. This will allow me to see how the algorithm scales.
+            Additionally, it will be a closer approximation to the data the program will be working with.
+
