@@ -47,30 +47,38 @@ def get_reads(seq_file, new_pos):
     # 10x coverage indicates the sum of all the reads being 10x the length of the genome.
     # number_of_reads = (coverage * (len(seq_file)))/len(lor)
     reads = []
-    while len(reads) < (coverage * len(seq_file)) / read_len:
-        start_pos = randint(0, len(seq_file) - read_len)
-        actual_read = seq_file[start_pos:start_pos + read_len]
-        reads.append([start_pos+new_pos, actual_read])
+    # while len(reads) < (coverage * len(seq_file)) / read_len:
+    read_pos = 0
+    overlap = 190
+    # Need to do some math to recalculate the coverage that is being achieved. There is probably a way to do this with
+    # a simple formula.
+    while read_pos < len(seq_file):
+        reads.append(seq_file[read_pos:read_pos + read_len])
+        read_pos += read_len - overlap
+        # Now, we might be able to tell how long certain rearrangements are... might be.
         # reads.append(seq_file[start_pos:start_pos + read_len_2])
     # Double-check the math here to make sure that the desired coverage is achieved
     # print(len(reads))
-    return sorted(reads)
+    print(reads)
+    return reads
 
 
 def reads_to_file(reads):
     """
-    Writes a fastQ file with the list of reads and adds a PHRED score
+    Writes a fastA file with the list of reads
     input: a list of reads
     output: a fastA file containing the reads and their number
     """
 
     my_file = open(read_file_name, "w")
     reads = sorted(reads)
+    read_num = 1
     for y in reads:
         for x in y:
             # print(x)
-            my_file.write(">r" + str(x[0]) + "\n")
-            my_file.write(str(x[1]) + "\n")
+            my_file.write(">r" + str(read_num) + "\n")
+            my_file.write(str(x) + "\n")
+            read_num += 1
 
     my_file.close()
 
@@ -84,8 +92,8 @@ if __name__ == "__main__":
     for i in h:
         j.append(get_reads(i, new_pos))
         new_pos += len(i)
-        r = get_reads(i, new_pos)
-        print(len(i))
+        # r = get_reads(i, new_pos)
+        # print(len(i))
         # This method still needs to be updated. The starting positions in get_reads() are reset upon each iteration.
         # I need to adjust each new starting position. This method might work! Again, why am I making them randomly?
     # print(j)
