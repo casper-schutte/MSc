@@ -19,15 +19,15 @@ def get_seq(genome):
     output: string
     """
 
-    a = open(genome)
-    b = (a.read()).split(">")
-    z = []
-    for x in b[1:]:
-        z.append(x[x.index("\n") + 1:])
-    d = []
+    with open(genome, "r") as a:
+        b = (a.read()).split(">")
+        z = []
+        for x in b[1:]:
+            z.append(x[x.index("\n") + 1:])
+        d = []
 
-    for x in z:
-        d.append(x.replace("\n", ""))
+        for x in z:
+            d.append(x.replace("\n", ""))
     # print(len(d))
     # This method returns a list of the sequences in the fastA file, where each chromosome is an element. This is
     # important because if this wasn't done, reads would be created that span 2 chromosomes
@@ -42,7 +42,7 @@ def get_reads(seq_file, new_pos):
     """
     read_len = 200
     # read_len_2 = 200
-    coverage = 20
+    # coverage = 20
     # 1x coverage here is defined as the sum of all the reads being equal to the length of the genome
     # 10x coverage indicates the sum of all the reads being 10x the length of the genome.
     # number_of_reads = (coverage * (len(seq_file)))/len(lor)
@@ -59,7 +59,6 @@ def get_reads(seq_file, new_pos):
         # reads.append(seq_file[start_pos:start_pos + read_len_2])
     # Double-check the math here to make sure that the desired coverage is achieved
     # print(len(reads))
-    print(reads)
     return reads
 
 

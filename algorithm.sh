@@ -52,7 +52,6 @@ multiple_report_align ${genomeB} ${readsA} MAB
 
 sort_sams(){
 	samtools sort "$1" -O sam > $2
-
 }
 
 sort_sams SBA.sam SBA.sorted.sam
@@ -65,5 +64,8 @@ python3 find_borders_bash.py SAB.sorted.sam sAB.txt S
 python3 find_borders_bash.py MBA.sorted.sam mBA.txt M
 python3 find_borders_bash.py MAB.sorted.sam mAB.txt M
 
-echo 
+echo
+
+
+python3 analyse_borders.py
 echo "Done..."

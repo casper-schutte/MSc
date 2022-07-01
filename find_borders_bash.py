@@ -60,6 +60,7 @@ def get_borders(borders):
     for border in borders:
         cigar_str = border[4]
         temp_list = []
+        # if cigar_str.count("M") == 1:
         for character in cigar_str:
             if character == "M":
                 bps.append(temp_list)
@@ -109,7 +110,7 @@ def refine_breakpoints(bp):
             nonconf_borders.append(read)
 
     border_areas = []
-    allowance = 20
+    allowance = 50
     # Think about letting allowance change to be inversely proportional to the MAPQ score.
     counter = 0
     # counter to keep track of where we are in the list
@@ -139,13 +140,21 @@ def refine_breakpoints(bp):
 
     # print(border_areas)
     # print(len(border_areas[0]) + len(border_areas[1]))
-
+    # for i in border_areas:
+    #     if len(i) > 1:
+    #         print(i)
     return border_areas
 
 
 def write_to_file(breakpoints, duplicated_reads):
+    """
+    This function writes the breakpoints to a file. Update the description.
+    :param breakpoints:
+    :param duplicated_reads:
+    :return:
+    """
     # This function writes the potential borders to a file (name specified at bottom of the script).
-    # If there are duplicated reads (if Bowtie2 is in k-reporting mode), they will be appended to the end of the
+    # If there are duplicated reads (if Bowtie2 is in "-k 2" reporting mode), they will be appended to the end of the
     # output file, along with their occurrence.
 
     my_file = open(file_name, "w")
@@ -161,7 +170,8 @@ def write_to_file(breakpoints, duplicated_reads):
             diff = 0
             positions = []
             for i in area:
-                positions.append(int(i[2].split("r")[1]))
+                positions.append(int(i[2].split("r")[1]) * 10)
+                # The * 10 in the line above is to account for the distance between the start of each consecutive read.
             diff = max(positions) - min(positions)
             threshold_len = 2
             if len(area) > threshold_len:
@@ -188,9 +198,9 @@ def find_duplicate_reads(breakpoints):
     # print(f"duplicates: {duplicates}")
     # The sorcery below checks for reads mapping to more than one place
     grouped_borders = [list(x) for y, x in groupby(duplicates, lambda x: x[2])]
-    # print(grouped_borders)
-
     connected_borders = []
+    # for i in grouped_borders:
+    #     print(i)
     for border in grouped_borders:
         if border[0][0] != border[1][0] or border[0][1] != border[1][1]:
             connected_borders.append([border[0][0], border[0][1],
@@ -205,7 +215,6 @@ def find_duplicate_reads(breakpoints):
         my_list.append([connected_borders.count(list(connection)),
                         connection])
 
-    # print(my_list)
     if not grouped_borders:
         return None
     else:
