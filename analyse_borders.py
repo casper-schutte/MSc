@@ -24,7 +24,7 @@ def extract_borders(file_name):
                 if j != "" and j.isdigit() is False:
                     j = j.split("\t")
                     temp_list.append([
-                        j[0], j[1], j[2].strip("r"), j[3], j[4]])
+                        j[0], j[1], j[2].strip("r"), j[3], j[4], j[5]])
             borders.append(temp_list)
         for k in borders:
             threshold = 10
@@ -35,7 +35,8 @@ def extract_borders(file_name):
                 start_pos.append(int(border[2]))
             if max(start_pos) - min(start_pos) > threshold:
                 checked_borders.append(k)
-    # print(checked_borders)
+    print(f"{file_name}: total number of borders: {sab_lines.count('>')}\n"
+          f" refined borders: {len(checked_borders)}")
     return checked_borders
 
 
@@ -65,23 +66,27 @@ def compare_borders(borders_a, borders_b):
 
 def output_all_borders(s1, s2, m1, m2):
     gen_a = []
-    gen_b= []
+    gen_b = []
     for i in s1:
         gen_a.append(i[0][0:2])
     for i in s2:
         gen_b.append(i[0][0:2])
     print(f"\nGenome A:")
-    for i in gen_a:
-        print(i)
+    # for i in gen_a:
+    #     print(i)
+    print(gen_a)
     print(f"connected borders:")
-    for i in m1:
-        print(f"{i}")
+    # for i in m1:
+    #     print(f"{i}")
+    print(m1)
     print(f"\nGenome B:")
-    for i in gen_b:
-        print(i)
+    # for i in gen_b:
+    #     print(i)
+    print(gen_b)
     print(f"connected borders:")
-    for i in m2:
-        print(i)
+    # for i in m2:
+    #     print(i)
+    print(m2)
 
 
 if __name__ == "__main__":
@@ -90,3 +95,5 @@ if __name__ == "__main__":
     mab = get_connected_borders(mAB)
     mba = get_connected_borders(mBA)
     output_all_borders(sab, sba, mab, mba)
+
+# TODO: Clean up this script.

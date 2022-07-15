@@ -41,6 +41,7 @@ def get_border_reads():
     # with its associated information.
     for read in enumerate(rocigar):
         if read[1] == f"{read_len}M" or read[1] == f"{read_len_2}M":
+            # TODO add filters HERE to remove reads that had other characters or multiple M in CIGAR?
             pass
         else:
             borders.append([chrom[read[0]], pos[read[0]], read_name[read[0]], mapq[read[0]], read[1]])
@@ -52,7 +53,7 @@ def get_borders(borders):
     """
     This function takes the reads which are suspected to contain rearrangement breakpoints and extracts the CIGAR
     strings. Then, the reads are returned BUT with ADJUSTED positions. These positions refer to the last (or first)
-    mapping read, depending on whether it matched initially or started matching somewhere along its length.
+    mapping base pair, depending on whether it matched initially or started matching somewhere along its length.
     :param borders:
     :return breakpoints:
     """
@@ -60,19 +61,20 @@ def get_borders(borders):
     for border in borders:
         cigar_str = border[4]
         temp_list = []
-        # if cigar_str.count("M") == 1:
-        for character in cigar_str:
-            if character == "M":
-                bps.append(temp_list)
-                break
-                # Honestly a pretty a cool piece of original code.
-            elif character.isalpha() and character != "M":
-                temp_list = ["-"]
-            elif character.isdigit():
-                if not temp_list:
-                    temp_list.append(character)
-                else:
-                    temp_list.append("".join(character))
+        if cigar_str.count("M") == 1:
+            # print(cigar_str)
+            for character in cigar_str:
+                if character == "M":
+                    bps.append(temp_list)
+                    break
+                    # Honestly a pretty a cool piece of original code.
+                elif character.isalpha() and character != "M":
+                    temp_list = ["-"]
+                elif character.isdigit():
+                    if not temp_list:
+                        temp_list.append(character)
+                    else:
+                        temp_list.append("".join(character))
 
     matching = []
     for numbers in bps:
@@ -80,63 +82,77 @@ def get_borders(borders):
 
     breakpoints = []
     for m in enumerate(matching):
-        if m[1].count("-") == 0 and int(m[1]) > 0:
-            breakpoints.append([
-                borders[m[0]][0], borders[m[0]][1] + int(m[1]), borders[m[0]][2], borders[m[0]][3], borders[m[0]][4],
-                "+"
-            ])
-            # The "+ int(m[1])" shifts the position to the breakpoint instead of where the read starts.
-            # For the reads that do match at the start (below), the position already refers to the potential
-            # breakpoints.
-        else:
-            breakpoints.append([
-                borders[m[0]][0], borders[m[0]][1], borders[m[0]][2], borders[m[0]][3],
-                borders[m[0]][4], "-"
-            ])
+        if borders[m[0]][4].count("M") == 1 and borders[m[0]][4].count("S") < 2:
+            if m[1].count("-") == 0 and int(m[1]) > 0:
+                breakpoints.append([
+                    borders[m[0]][0], borders[m[0]][1] + int(m[1]), borders[m[0]][2], borders[m[0]][3],
+                    borders[m[0]][4], "+"
+                ])
+                # The "+ int(m[1])" shifts the position to the breakpoint instead of where the read starts.
+                # For the reads that do match at the start (below), the position already refers to the potential
+                # breakpoints.
+            else:
+                breakpoints.append([
+                    borders[m[0]][0], borders[m[0]][1], borders[m[0]][2], borders[m[0]][3],
+                    borders[m[0]][4], "-"
+                ])
+
     return breakpoints
 
 
 def refine_breakpoints(bp):
     conf_borders = []
-    nonconf_borders = []
-
+    non_conf_borders = []
+    mapq_threshold = 40
     for read in bp:
         # write a function that takes the mapq score into account, and extends the reads by the inverse of the MAPQ
         # Multiplied by some constant (optimize). In this way, we can statistically back up the position of the
         # breakpoint with multiple reads that map to the same area.
-        if read[3] > 40:
+        # On the other hand, this could get messy.
+        if int(read[3]) > int(mapq_threshold):
             conf_borders.append(read)
         else:
-            nonconf_borders.append(read)
+            non_conf_borders.append(read)
 
     border_areas = []
-    allowance = 50
-    # Think about letting allowance change to be inversely proportional to the MAPQ score.
+    allowance = 1
     counter = 0
     # counter to keep track of where we are in the list
     for border in conf_borders:
+        if conf_borders.count(border) > 1:
+            print(f"{border} has multiple hits")
+        # print(border)
         # This loop groups the most confident borders by whether they are within a certain distance from one another.
         if not border_areas:
             border_areas.append([border])
-        elif border[1] - allowance <= border_areas[counter][0][1] <= border[1] + allowance \
-                and border[0] == border_areas[counter][0][0]:
+        elif border[1] - allowance < border_areas[counter][0][1] < border[1] + allowance \
+                and border[0] == border_areas[counter][0][0] and border[5] == border_areas[counter][0][5]:
             border_areas[counter].append(border)
         else:
             border_areas.append([border])
             counter += 1
 
+    for border in border_areas:
+        if border_areas.count(border) > 1:
+            print(f"{border} has multiple hits")
     done = []
-    for border in nonconf_borders:
+    non_conf_allowance = 10
+    for border in non_conf_borders:
         if border not in done:
             for cb in border_areas:
                 # print(f"cb: {cb}")
-                if border[1] - allowance <= cb[0][1] <= border[1] + allowance and border[0] == cb[0][0]:
+                if border[1] - non_conf_allowance <= cb[0][1] <= border[1] + non_conf_allowance and \
+                        border[0] == cb[0][0] and border[5] == cb[0][5]:
                     border_areas[border_areas.index(cb)].append(border)
                     done.append(border)
 
-    for border in nonconf_borders:
-        if border not in done:
-            border_areas.append([border])
+    for border in done:
+        if border_areas.count(border) > 1:
+            print(f"{border} has multiple hits")
+
+    # for border in non_conf_borders:
+    #     if border not in done:
+    #         border_areas.append([border])
 
     # print(border_areas)
     # print(len(border_areas[0]) + len(border_areas[1]))
@@ -148,42 +164,32 @@ def refine_breakpoints(bp):
 
 def write_to_file(breakpoints, duplicated_reads):
     """
-    This function writes the breakpoints to a file. Update the description.
+    This function writes either the breakpoints or the connected borders to a file, depending on the mode (M or S).
+    If the mode is "S", the potential borders that had less than 5 reads supporting them are discarded.
     :param breakpoints:
     :param duplicated_reads:
     :return:
     """
-    # This function writes the potential borders to a file (name specified at bottom of the script).
-    # If there are duplicated reads (if Bowtie2 is in "-k 2" reporting mode), they will be appended to the end of the
-    # output file, along with their occurrence.
-
     my_file = open(file_name, "w")
     if mode == "M":
-        # my_file.write(f"connected borders: \n")
         for dup in duplicated_reads:
             my_file.write(f"{dup[0]}\t{dup[1]}\n")
-            # my_file.write("\n")
     elif mode == "S":
         # my_file.write(f"chromosome \t position \t read name \t MAPQ \t CIGAR string \n")
-        # my_file.write(f"\n")
         for area in breakpoints:
-            diff = 0
+            area.sort(key=lambda x: x[1])
             positions = []
             for i in area:
                 positions.append(int(i[2].split("r")[1]) * 10)
                 # The * 10 in the line above is to account for the distance between the start of each consecutive read.
+                # This needs to change with the overlap and read length if these are changed.
             diff = max(positions) - min(positions)
-            threshold_len = 2
+            threshold_len = 5
             if len(area) > threshold_len:
                 my_file.write(f">{diff}")
-                # my_file.write(f"Read count: {str(len(area))} ")
                 my_file.write("\n")
-                # my_file.write(f"{area[0]}")
                 for bp in area:
-                    my_file.write(f"{bp[0]}\t{bp[1]}\t{bp[2]}\t{bp[3]}\t{bp[4]}\n")
-
-        # my_file.write("\n")
-    
+                    my_file.write(f"{bp[0]}\t{bp[1]}\t{bp[2]}\t{bp[3]}\t{bp[4]}\t{bp[5]}\n")
     my_file.close()
 
 
@@ -195,12 +201,9 @@ def find_duplicate_reads(breakpoints):
         if read_names.count(name[1]) > 1:
             duplicates.append(flat_borders[name[0]])
     duplicates.sort(key=lambda x: x[2])
-    # print(f"duplicates: {duplicates}")
     # The sorcery below checks for reads mapping to more than one place
     grouped_borders = [list(x) for y, x in groupby(duplicates, lambda x: x[2])]
     connected_borders = []
-    # for i in grouped_borders:
-    #     print(i)
     for border in grouped_borders:
         if border[0][0] != border[1][0] or border[0][1] != border[1][1]:
             connected_borders.append([border[0][0], border[0][1],
@@ -212,8 +215,9 @@ def find_duplicate_reads(breakpoints):
     # print(my_set)
     my_list = []
     for connection in my_set:
-        my_list.append([connected_borders.count(list(connection)),
-                        connection])
+        if connected_borders.count(list(connection)) > 4:
+            my_list.append([connected_borders.count(list(connection)),
+                            connection])
 
     if not grouped_borders:
         return None
